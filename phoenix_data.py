@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 import torchvision
 import os
+import itertools
 
 class PhoenixDataset(torch.utils.data.Dataset):
     def __init__(self,
@@ -88,8 +89,8 @@ class PhoenixDataset(torch.utils.data.Dataset):
         return len(self.data)
 
 class PhoenixTimeArrowDataset(PhoenixDataset):
-    def __init__(self, data, videos_root=None, clip_length=32, **kwargs):
-        super(PhoenixTimeArrowDataset, self).__init__(data, videos_root, source_mode='video', target_mode=None, **kwargs)
+    def __init__(self, data, clip_length=32, **kwargs):
+        super(PhoenixTimeArrowDataset, self).__init__(data, source_mode='video', target_mode=None, **kwargs)
         self.clip_length = clip_length
 
     def __getitem__(self, idx):
@@ -114,9 +115,36 @@ class PhoenixTimeArrowDataset(PhoenixDataset):
 
 
 class PhoenixVCOPDataset(PhoenixDataset):
-    def __init__(self, data, videos_root=None, video_scale_factor=1, return_name=False):
-        super(PhoenixVCOPDataset, self).__init__(data, videos_root, video_scale_factor=video_scale_factor, return_name=return_name, source_mode='video', target_mode=None)
+    def __init__(self, data, num_clips, clip_length, interval, **kwargs):
+        super(PhoenixVCOPDataset, self).__init__(data, source_mode='video', target_mode=None, **kwargs)
+        self.min_video_length = num_clips * clip_length + (num_clips-1)*interval
+        self.num_clips = num_clips
+        self.clip_length = clip_length
+        self.interval = interval
 
+        assert num_clips == 3, 'Only 3 clips are supported for the moment'
 
+        self.orders = list(itertools.permutations(list(range(self.num_clips))))
+
+    def __getitem__(self, idx):
+        i = idx
+        while True:
+            video = super(PhoenixVCOPDataset, self).__getitem__(i) # video should have shape (channels, length, height, width)
+            num_frames = video.shape[1]
+            if num_frames >= self.min_video_length:
+                break
+            i = torch.randint(low=0, high=self.__len__(), size=(1,))
+
+        clips = []
+        t0 = torch.randint(low=0, high=max(1, num_frames-self.min_video_length), size=(1,))
+        for j in range(self.num_clips):
+            clips.append(video[:, t0:t0+self.clip_length])
+            t0 += self.clip_length + self.interval
+
+        order_index =  torch.randint(low=0, high=len(self.orders), size=(1,))
+        order = self.orders[order_index]
+        clips = [clips[j] for j in order]
+
+        return clips, order_index
 
 
