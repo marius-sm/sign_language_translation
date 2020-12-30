@@ -3,6 +3,7 @@ import torch.nn.functional as F
 import torchvision
 import os
 import itertools
+import time
 
 class PhoenixDataset(torch.utils.data.Dataset):
     def __init__(self,
@@ -12,6 +13,7 @@ class PhoenixDataset(torch.utils.data.Dataset):
         target_mode='text',
         rescale_mean=[0.43216, 0.394666, 0.37645], # from https://pytorch.org/docs/stable/torchvision/models.html#video-classification
         rescale_std=[0.22803, 0.22145, 0.216989],  # from https://pytorch.org/docs/stable/torchvision/models.html#video-classification
+        dont_rescale=False,
         resize_factor=1,
         return_name=False
         ):
@@ -28,6 +30,7 @@ class PhoenixDataset(torch.utils.data.Dataset):
         self.target_mode = target_mode # can be 'gloss', 'text', 'video', 'sign' or None
         self.rescale_mean = torch.Tensor(rescale_mean)[:, None, None, None]
         self.rescale_std = torch.Tensor(rescale_std)[:, None, None, None]
+        self.dont_rescale = dont_rescale # for some usecases it can be better to rescale later (better performance)
         self.resize_factor = resize_factor
         self.return_name = return_name # If True, returns the 'name' attribute of the annotation
 
@@ -35,6 +38,8 @@ class PhoenixDataset(torch.utils.data.Dataset):
         assert self.target_mode in ['gloss', 'text', 'video', 'sign', 'embedding', None], 'Invalid target mode'
 
     def rescale_video(self, video):
+        # rescaling is slow
+        if self.dont_rescale: return video
         return (video.float()/255-self.rescale_mean) / self.rescale_std
     
     def resize_video(self, video):
@@ -54,7 +59,7 @@ class PhoenixDataset(torch.utils.data.Dataset):
 
         if video.shape[-1] == 3:
             # shape is probabaly (length, height, width, channels)
-            video = video.permute(3, 0, 1, 2) # shape is now (channels, length, height, width)
+            video = video.permute(3, 0, 1, 2) # shape is now (channels, length, height, width). This is fast
 
         return video
     
@@ -116,13 +121,17 @@ class PhoenixTimeArrowDataset(PhoenixDataset):
 
 class PhoenixVCOPDataset(PhoenixDataset):
     def __init__(self, data, num_clips, clip_length, interval, **kwargs):
-        super(PhoenixVCOPDataset, self).__init__(data, source_mode='video', target_mode=None, **kwargs)
+
+        self.dont_rescale = kwargs.get('dont_rescale', False) # rescale by default
+        self.resize_factor = kwargs.get('resize_factor', 1) # dont resize by default
+        parent_kwargs = {k: v for k, v in kwargs.items() if not k in ['resize_factor', 'dont_rescale']}
+        super(PhoenixVCOPDataset, self).__init__(data, source_mode='video', target_mode=None, dont_rescale=True, resize_factor=1, **parent_kwargs)
+        # for better performance, we rescale and resize only once the clips have been extracted
+
         self.min_video_length = num_clips * clip_length + (num_clips-1)*interval
         self.num_clips = num_clips
         self.clip_length = clip_length
         self.interval = interval
-
-        assert num_clips == 3, 'Only 3 clips are supported for the moment'
 
         self.orders = list(itertools.permutations(list(range(self.num_clips))))
 
@@ -134,6 +143,7 @@ class PhoenixVCOPDataset(PhoenixDataset):
             if num_frames >= self.min_video_length:
                 break
             i = torch.randint(low=0, high=self.__len__(), size=(1,))
+            print(idx, 'new iteration required')
 
         clips = []
         t0 = torch.randint(low=0, high=max(1, num_frames-self.min_video_length), size=(1,))
@@ -143,7 +153,7 @@ class PhoenixVCOPDataset(PhoenixDataset):
 
         order_index =  torch.randint(low=0, high=len(self.orders), size=(1,))
         order = self.orders[order_index]
-        clips = [clips[j] for j in order]
+        clips = [self.resize_video(self.rescale_video(clips[j])) for j in order]
 
         return clips, order_index
 
