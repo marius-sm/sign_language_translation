@@ -35,8 +35,8 @@ class VCOPModel(nn.Module):
                 pairs.append(torch.cat([features[i], features[j]], dim=1))
 
         x = [self.fc1(p) for p in pairs]
-        x = [self.relu(y) for y in x]
         x = torch.cat(x, dim=1)
+        x = self.relu(x)
         x = self.dropout(x)
         x = self.fc2(x)  # logits
 
