@@ -70,14 +70,22 @@ def train_model(model,
             if i%print_every == print_every-1:
                 print(f'Epoch {epoch}, iteration {i}/{len(trainloader)}: running loss {running_loss:.4f}, running accuracy {running_accuracy:.4f}')
         
-        print(f'Epoch {epoch}: training loss {epoch_loss/epoch_samples:.4f}, training accuracy {epoch_correct/epoch_samples:.4f}')
+        train_loss = epoch_loss/epoch_samples
+        train_accuracy = epoch_correct/epoch_samples
+        print(f'Epoch {epoch}: training loss {train_loss:.4f}, training accuracy {train_accuracy:.4f}')
         
         if validloader is not None:
-            val_loss, val_accuracy = evaluate_model(model, validloader, training_step_fn)
-            print(f'Validation accuracy {val_accuracy:.4f}, loss {val_loss:.4f}\n')
+            valid_loss, valid_accuracy = evaluate_model(model, validloader, training_step_fn)
+            print(f'Validation accuracy {valid_accuracy:.4f}, loss {valid_loss:.4f}\n')
         else:
             print()
 
-        on_epoch_end(epoch)
+        on_epoch_end({
+            'epoch': epoch,
+            'train_loss': train_loss,
+            'train_accuracy': train_accuracy,
+            'valid_loss': valid_loss,
+            'valid_accuracy': valid_accuracy
+        })
 
     print('Finished Training')
