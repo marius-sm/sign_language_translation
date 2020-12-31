@@ -28,7 +28,6 @@ class VCOPModel(nn.Module):
         features = []
         for clip_batch in clip_list:
             f = self.feature_extractor(clip_batch)
-            print(f.shape)
             features.append(self.flatten(self.pooling(f)))
 
         pairs = []  # pairwise concatenation of features
@@ -49,11 +48,11 @@ def training_step_fn(model, batch):
     device = next(model.parameters()).device
 
     inputs, targets = batch
-    targets = targets.to(device)
+    targets = targets.to(device)[:, 0]
     inputs = [i.to(device) for i in inputs]
     logits = model(clip_list=inputs)
 
-    loss = F.cross_entropy(logits, targets[:, 0], reduction='none')
+    loss = F.cross_entropy(logits, targets, reduction='none')
     summed_loss = loss.sum()
     predicted = logits.argmax(1)
     num_correct_samples = (predicted == targets).float().sum()
