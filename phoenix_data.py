@@ -165,7 +165,7 @@ class PhoenixVCOPDataset(PhoenixDataset):
             if num_frames >= self.min_video_length:
                 break
             i = torch.randint(low=0, high=self.__len__(), size=(1,))
-            print(idx, 'new iteration required')
+            print(f'Sample {idx} does not have enough frames')
 
         clips = []
         t0 = torch.randint(low=0, high=max(1, num_frames-self.min_video_length), size=(1,))
