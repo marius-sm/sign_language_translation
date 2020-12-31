@@ -49,6 +49,7 @@ def training_step_fn(model, batch):
     device = next(model.parameters()).device
 
     inputs, targets = batch
+    targets = targets.to(device)
     inputs = [i.to(device) for i in inputs]
     logits = model(clip_list=inputs)
 
