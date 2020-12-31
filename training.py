@@ -1,4 +1,5 @@
 import tqdm
+import torch
 
 def evaluate_model(model, loader, training_step_fn):
     model.eval()
