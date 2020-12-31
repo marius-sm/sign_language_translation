@@ -17,7 +17,16 @@ def evaluate_model(model, loader, training_step_fn):
             
     return total_loss/total_samples, total_correct/total_samples
 
-def train_model(model, training_step_fn, trainloader, validloader=None, epochs=2, optimizer=None, print_every=1, on_epoch_end=lambda x: x):
+def train_model(model,
+    training_step_fn,
+    trainloader,
+    validloader=None,
+    epochs=2,
+    optimizer=None,
+    print_every=1,
+    on_epoch_end=lambda x: x,
+    save_best_to=False,
+    ):
     
     alpha = 0.9
 
