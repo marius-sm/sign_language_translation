@@ -206,7 +206,18 @@ def train_embeddings2text(model, trainloader, validloader=None, epochs=2, optimi
         on_epoch_end=on_epoch_end
     )
 
-def compute_bleu(model, input_list, target_text_list, text_tokenizer, input_type='glosses', gloss_tokenizer=None, eos_token_id=2, bos_token_id=1, pad_token_id=0, print_predictions=False, **generate_kwargs):
+def compute_bleu(model,
+    input_list,
+    target_text_list,
+    text_tokenizer,
+    input_type='glosses',
+    gloss_tokenizer=None,
+    eos_token_id=2,
+    bos_token_id=1,
+    pad_token_id=0,
+    print_predictions=False,
+    **generate_kwargs
+    ):
     
     assert input_type in ['embeddings', 'glosses'], 'input_type can be "glosses" or "embeddings"'
     assert not (input_type == 'glosses' and gloss_tokenizer is None), 'If input_type is "glosses", please provide the gloss_tokenizer'
@@ -257,48 +268,3 @@ def compute_bleu(model, input_list, target_text_list, text_tokenizer, input_type
     for i in range(1, 5):
         metric.add_batch(predictions=all_predictions, references=all_targets)
         print(f'BLEU-{i}:', metric.compute(max_order=i)['bleu'])
-
-# def compute_bleu_embeddings2text(model, input_embeddings_list, target_text_list, text_tokenizer, eos_token_id=2, bos_token_id=1, pad_token_id=0, **generate_kwargs):
-#     metric = datasets.load_metric('bleu')
-
-#     all_predictions = []
-#     all_targets = []
-
-#     device = model.device
-
-#     model.eval()
-#     with torch.no_grad():
-#         for input_embedding, target_text in zip(tqdm.tqdm(input_embeddings_list, disable=True), target_text_list):
-
-#             assert len(input_embedding.shape) == 2, "The input embeddings must have shape (sequence length, embedding dim)"
-            
-#             target_ids = text_tokenizer.encode(target_text).ids
-#             target_ids = torch.tensor(target_ids, dtype=torch.long, device=device)
-
-#             output_ids = model.generate(
-#                 inputs_embeds=input_embedding.unsqueeze(0),
-#                 eos_token_id=eos_token_id,
-#                 bos_token_id=bos_token_id,
-#                 pad_token_id=pad_token_id,
-#                 length_penalty=1,
-#                 num_beams=5,
-#                 max_length=30,
-#                 **generate_kwargs
-#             )
-#             output_ids = output_ids[0]
-            
-#             predicted_sentence = text_tokenizer.decode(output_ids.tolist(), skip_special_tokens=True)
-            
-#             #print(source)
-#             print(predicted_sentence, 'should be', target_text)
-#             #print(target)
-#             #print()
-            
-#             all_predictions.append(output_ids.cpu().numpy().astype(str)[1:-1])
-#             all_targets.append(target_ids.cpu().unsqueeze(0).numpy().astype(str))
-
-#     for i in range(1, 5):
-#         metric.add_batch(predictions=all_predictions, references=all_targets)
-#         print(f'BLEU-{i}:', metric.compute(max_order=i)['bleu'])
-
-
