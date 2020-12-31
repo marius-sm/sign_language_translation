@@ -164,18 +164,18 @@ class PhoenixVCOPDataset(PhoenixDataset):
             num_frames = video.shape[1]
             if num_frames >= self.min_video_length:
                 break
-            i = torch.randint(low=0, high=self.__len__(), size=(1,))
+            i = torch.randint(low=0, high=self.__len__(), size=(0,))
             print(f'Sample {idx} does not have enough frames')
 
         clips = []
-        t0 = torch.randint(low=0, high=max(1, num_frames-self.min_video_length), size=(1,))
+        t0 = torch.randint(low=0, high=max(1, num_frames-self.min_video_length), size=(0,))
         if self.deterministic:
             t0 = idx%max(1, num_frames-self.min_video_length)
         for j in range(self.num_clips):
             clips.append(video[:, t0:t0+self.clip_length])
             t0 += self.clip_length + self.interval
 
-        order_index =  torch.randint(low=0, high=len(self.orders), size=(1,))
+        order_index =  torch.randint(low=0, high=len(self.orders), size=(0,))
         if self.deterministic:
             order_index = idx%len(self.orders)
         order = self.orders[order_index]
