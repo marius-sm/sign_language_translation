@@ -4,6 +4,13 @@ import torchvision
 import os
 import itertools
 import time
+import gzip
+import pickle
+
+def data_from_file(filename):
+    with gzip.open(filename, 'rb') as f:
+        data = pickle.load(f)
+    return data
 
 class PhoenixDataset(torch.utils.data.Dataset):
     def __init__(self,
@@ -138,7 +145,7 @@ class PhoenixTimeArrowDataset(PhoenixDataset):
 
 
 class PhoenixVCOPDataset(PhoenixDataset):
-    def __init__(self, data, num_clips, clip_length, interval, **kwargs):
+    def __init__(self, data, num_clips, clip_length, interval, deterministic=False, **kwargs):
 
         super(PhoenixVCOPDataset, self).__init__(data, source_mode='video', target_mode=None, **kwargs)
 
@@ -146,6 +153,7 @@ class PhoenixVCOPDataset(PhoenixDataset):
         self.num_clips = num_clips
         self.clip_length = clip_length
         self.interval = interval
+        self.deterministic = deterministic
 
         self.orders = list(itertools.permutations(list(range(self.num_clips))))
 
@@ -161,11 +169,15 @@ class PhoenixVCOPDataset(PhoenixDataset):
 
         clips = []
         t0 = torch.randint(low=0, high=max(1, num_frames-self.min_video_length), size=(1,))
+        if self.deterministic:
+            t0 = idx%max(1, num_frames-self.min_video_length)
         for j in range(self.num_clips):
             clips.append(video[:, t0:t0+self.clip_length])
             t0 += self.clip_length + self.interval
 
         order_index =  torch.randint(low=0, high=len(self.orders), size=(1,))
+        if self.deterministic:
+            order_index = idx%len(self.orders)
         order = self.orders[order_index]
         clips = [self.resize_video(self.rescale_video(clips[j], self.normalize_mean, self.normalize_std), self.resize_factor) for j in order]
 
