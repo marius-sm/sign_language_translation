@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from phoenix_data import data_from_file, PhoenixVCOPDataset
 import math
 
 class VCOPModel(nn.Module):
