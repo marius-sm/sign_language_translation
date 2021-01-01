@@ -69,7 +69,7 @@ def train_model(model,
                 running_accuracy = running_accuracy * alpha + (1-alpha) * accuracy.item()
                 
             if i%print_every == print_every-1:
-                print(f'Epoch {epoch}, iteration {i}/{len(trainloader)}: running loss {running_loss:.4f}, running accuracy {running_accuracy:.4f}')
+                print(f'Epoch {epoch}, iteration {i}/{len(trainloader)}: running loss {running_loss:.4f}, running accuracy {running_accuracy:.4f}, batch loss: {mean_loss.item():.4f}, batch accuracy: {accuracy.item():.4f}')
         
         train_loss = epoch_loss/epoch_samples
         train_accuracy = epoch_correct/epoch_samples
