@@ -149,7 +149,7 @@ class PhoenixTimeArrowDataset(PhoenixDataset):
 
 
 class PhoenixVCOPDataset(PhoenixDataset):
-    def __init__(self, data, num_clips, clip_length, interval, deterministic=False, **kwargs):
+    def __init__(self, data, num_clips, clip_length, interval, deterministic=False, verbose=False, **kwargs):
 
         super(PhoenixVCOPDataset, self).__init__(data, source_mode='video', target_mode=None, **kwargs)
 
@@ -158,6 +158,7 @@ class PhoenixVCOPDataset(PhoenixDataset):
         self.clip_length = clip_length
         self.interval = interval
         self.deterministic = deterministic
+        self.verbose = verbose
 
         self.orders = list(itertools.permutations(list(range(self.num_clips))))
 
@@ -169,7 +170,8 @@ class PhoenixVCOPDataset(PhoenixDataset):
             if num_frames >= self.min_video_length:
                 break
             i = torch.randint(low=0, high=self.__len__(), size=(1,)).item()
-            print(f'Sample {idx} does not have enough frames (min {self.min_video_length})')
+            if self.verbose:
+                print(f'Sample {idx} does not have enough frames (min {self.min_video_length})')
 
         clips = []
         if not self.deterministic:
