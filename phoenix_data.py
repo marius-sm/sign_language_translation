@@ -115,18 +115,22 @@ class PhoenixDataset(torch.utils.data.Dataset):
         return len(self.data)
 
 class PhoenixTimeArrowDataset(PhoenixDataset):
-    def __init__(self, data, clip_length=32, **kwargs):
+    def __init__(self, data, clip_length=32, deterministic=False, **kwargs):
 
         super(PhoenixTimeArrowDataset, self).__init__(data, source_mode='video', target_mode=None, **kwargs)
 
         self.clip_length = clip_length
+        self.deterministic = deterministic
 
     def __getitem__(self, idx):
         video = super(PhoenixTimeArrowDataset, self).__getitem__(idx, normalize=False, resize_factor=1) # video should have shape (channels, length, height, width)
         num_frames = video.shape[1]
             
         # clip video
-        t0 = torch.randint(low=0, high=max(1, num_frames-self.clip_length), size=(1,)).item()
+        if not self.deterministic:
+            t0 = torch.randint(low=0, high=max(1, num_frames-self.clip_length), size=(1,)).item()
+        else:
+            t0 = idx%max(1, num_frames-self.clip_length)
         t1 = t0 + self.clip_length
         t1 = min(t1, num_frames)    
         video = video[:, t0:t1, :, :]
@@ -168,15 +172,17 @@ class PhoenixVCOPDataset(PhoenixDataset):
             print(f'Sample {idx} does not have enough frames (min {self.min_video_length})')
 
         clips = []
-        t0 = torch.randint(low=0, high=max(1, num_frames-self.min_video_length), size=(1,)).item()
-        if self.deterministic:
+        if not self.deterministic:
+            t0 = torch.randint(low=0, high=max(1, num_frames-self.min_video_length), size=(1,)).item()
+        else:
             t0 = idx%max(1, num_frames-self.min_video_length)
         for j in range(self.num_clips):
             clips.append(video[:, t0:t0+self.clip_length])
             t0 += self.clip_length + self.interval
 
-        order_index =  torch.randint(low=0, high=len(self.orders), size=(1,)).item()
-        if self.deterministic:
+        if not self.deterministic:
+            order_index =  torch.randint(low=0, high=len(self.orders), size=(1,)).item()
+        else:
             order_index = idx%len(self.orders)
         order = self.orders[order_index]
         clips = [self.resize_video(self.rescale_video(clips[j], self.normalize_mean, self.normalize_std), self.resize_factor) for j in order]
