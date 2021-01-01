@@ -19,8 +19,8 @@ class VCOPModel(nn.Module):
         num_pairs = (num_clips*(num_clips-1))//2
         self.fc2 = nn.Linear(512*num_pairs, self.num_orders)
 
-        self.dropout = nn.Dropout(p=dropout_prob, inplace=True)
-        self.relu = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(p=dropout_prob, inplace=False)
+        self.relu = nn.ReLU(inplace=False)
 
     def forward(self, clip_list):
 
