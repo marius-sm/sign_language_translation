@@ -227,8 +227,6 @@ class PhoenixDistancePredictionDataset(PhoenixDataset):
         else:
             short_interval_first = bool(idx%2)
 
-        print(short_interval_first)
-
         if short_interval_first:
             close = video[:, t0:t0+self.clip_length]
             t0 += self.clip_length + self.short_interval
