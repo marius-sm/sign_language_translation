@@ -192,3 +192,58 @@ class PhoenixVCOPDataset(PhoenixDataset):
         return clips, order_index
 
 
+class PhoenixDistancePredictionDataset(PhoenixDataset):
+    def __init__(self, data, clip_length, short_interval, long_interval, deterministic=False, verbose=False, **kwargs):
+
+        super(PhoenixDistancePredictionDataset, self).__init__(data, source_mode='video', target_mode=None, **kwargs)
+
+        self.min_video_length = 3 * clip_length + short_interval + long_interval
+        self.clip_length = clip_length
+        self.short_interval = short_interval
+        self.long_interval = long_interval
+        self.deterministic = deterministic
+        self.verbose = verbose
+
+    def __getitem__(self, idx):
+        i = idx
+        while True:
+            video = super(PhoenixDistancePredictionDataset, self).__getitem__(i, normalize=False, resize_factor=1) # video should have shape (channels, length, height, width)
+            num_frames = video.shape[1]
+            if num_frames >= self.min_video_length:
+                break
+            i = torch.randint(low=0, high=self.__len__(), size=(1,)).item()
+            if self.verbose:
+                print(f'Sample {idx} does not have enough frames (min {self.min_video_length})')
+
+        clips = []
+
+        if not self.deterministic:
+            t0 = torch.randint(low=0, high=max(1, num_frames-self.min_video_length), size=(1,)).item()
+        else:
+            t0 = idx%max(1, num_frames-self.min_video_length)
+
+        if not self.deterministic:
+            short_interval_first = bool(torch.randint(low=0, high=2, size=(1,)).item())
+        else:
+            short_interval_first = bool(idx%2)
+
+        print(short_interval_first)
+
+        if short_interval_first:
+            close = video[:, t0:t0+self.clip_length]
+            t0 += self.clip_length + self.short_interval
+            anchor = video[:, t0:t0+self.clip_length]
+            t0 += self.clip_length + self.long_interval
+            far = video[:, t0:t0+self.clip_length]
+        else:
+            far = video[:, t0:t0+self.clip_length]
+            t0 += self.clip_length + self.long_interval
+            anchor = video[:, t0:t0+self.clip_length]
+            t0 += self.clip_length + self.short_interval
+            close = video[:, t0:t0+self.clip_length]
+
+        anchor = self.resize_video(self.rescale_video(anchor, self.normalize_mean, self.normalize_std), self.resize_factor)
+        close = self.resize_video(self.rescale_video(anchor, self.normalize_mean, self.normalize_std), self.resize_factor)
+        far = self.resize_video(self.rescale_video(anchor, self.normalize_mean, self.normalize_std), self.resize_factor)
+
+        return anchor, close, far
