@@ -241,7 +241,7 @@ class PhoenixDistancePredictionDataset(PhoenixDataset):
             close = video[:, t0:t0+self.clip_length]
 
         anchor = self.resize_video(self.rescale_video(anchor, self.normalize_mean, self.normalize_std), self.resize_factor)
-        close = self.resize_video(self.rescale_video(anchor, self.normalize_mean, self.normalize_std), self.resize_factor)
-        far = self.resize_video(self.rescale_video(anchor, self.normalize_mean, self.normalize_std), self.resize_factor)
+        close = self.resize_video(self.rescale_video(close, self.normalize_mean, self.normalize_std), self.resize_factor)
+        far = self.resize_video(self.rescale_video(far, self.normalize_mean, self.normalize_std), self.resize_factor)
 
         return anchor, close, far
