@@ -12,4 +12,4 @@ Best accuracy in 20 epochs: 50.64
 
 Embeddings from R(2+1)D pre-trained on Kinetics-400:
 
-Best accuracy in 20 epochs: 41.07
+Best accuracy in 20 epochs: 45.64
