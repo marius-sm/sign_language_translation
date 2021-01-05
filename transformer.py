@@ -9,6 +9,7 @@ import time
 import os
 from .training import train_model
 import torch.nn.functional as F
+import torch
 
 def create_tokenizer(sentence_list):
     filename = f'temp_{time.strftime("%Y%m%d-%H%M%S")}.txt'
