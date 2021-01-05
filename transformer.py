@@ -7,7 +7,7 @@ from tokenizers import decoders
 import datasets
 import time
 import os
-from training import train_model
+from .training import train_model
 import torch.nn.functional as F
 
 def create_tokenizer(sentence_list):
