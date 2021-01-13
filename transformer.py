@@ -218,7 +218,7 @@ def compute_bleu(model,
     bos_token_id=1,
     pad_token_id=0,
     print_predictions=False,
-    **generate_kwargs
+    generate_kwargs={}
     ):
     
     assert input_type in ['embeddings', 'glosses'], 'input_type can be "glosses" or "embeddings"'
@@ -233,7 +233,7 @@ def compute_bleu(model,
 
     model.eval()
     with torch.no_grad():
-        for i, (inputs, target_text) in enumerate(zip(tqdm.tqdm(input_list, disable=print_predictions), target_text_list)):
+        for i, (inputs, target_text) in enumerate(zip(tqdm(input_list, disable=print_predictions), target_text_list)):
             
             target_ids = text_tokenizer.encode(target_text).ids
             target_ids = torch.tensor(target_ids, dtype=torch.long, device=device)
@@ -253,9 +253,6 @@ def compute_bleu(model,
                 eos_token_id=eos_token_id,
                 bos_token_id=bos_token_id,
                 pad_token_id=pad_token_id,
-                length_penalty=1,
-                num_beams=5,
-                max_length=30,
                 **generate_kwargs
             )
             output_ids = output_ids[0]
