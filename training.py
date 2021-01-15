@@ -1,5 +1,6 @@
 import tqdm
 import torch
+import time
 
 def evaluate_model(model, loader, training_step_fn):
     model.eval()
@@ -109,4 +110,3 @@ def train_model(model,
         })
 
     print('Finished Training')
-    
