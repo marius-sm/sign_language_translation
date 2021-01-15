@@ -79,7 +79,7 @@ def dope_video(model, video_path, postprocessing='ppi', output_dir='outputs/', s
 
         # save 3D results
         if save_3d:
-            det_poses3d = {part: np.stack([d['pose3d'] for d in part_detections], axis=0) if len(part_detections)>0 else -1*np.ones((1,num_joints[part],2), dtype=np.float32) for part, part_detections in detections.items()}
+            det_poses3d = {part: np.stack([d['pose3d'] for d in part_detections], axis=0) if len(part_detections)>0 else -1*np.ones((1,num_joints[part],3), dtype=np.float32) for part, part_detections in detections.items()}
             for k, v in det_poses3d.items():
                 out_dir = os.path.join(output_dir, 'arrays', '3d', video_name)
                 if not os.path.exists(out_dir):
