@@ -105,8 +105,8 @@ def train_model(model,
             'epoch': epoch,
             'train_loss': train_loss,
             'train_accuracy': train_accuracy,
-            'valid_loss': valid_loss,
-            'valid_accuracy': valid_accuracy
+            'valid_loss': None if validloader is None else valid_loss,
+            'valid_accuracy': None if validloader is None else valid_accuracy
         })
 
     print('Finished Training')
