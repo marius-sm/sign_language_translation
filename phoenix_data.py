@@ -31,7 +31,8 @@ class PhoenixDataset(torch.utils.data.Dataset):
         normalize_std=[0.22803, 0.22145, 0.216989],  # from https://pytorch.org/docs/stable/torchvision/models.html#video-classification
         resize_factor=1,
         return_name=False,
-        video_filter=lambda v: True
+        video_filter=lambda v: True,
+        store_videos=False
         ):
         super(PhoenixDataset, self).__init__()
 
@@ -51,6 +52,8 @@ class PhoenixDataset(torch.utils.data.Dataset):
         self.resize_factor = resize_factor
         self.return_name = return_name # If True, returns the 'name' attribute of the annotation
         self.video_filter = video_filter
+        self.store_videos = store_videos
+        self.storage = {}
 
         assert self.source_mode in ['gloss', 'text', 'video', 'sign', 'embedding'], 'Invalid source mode'
         assert self.target_mode in ['gloss', 'text', 'video', 'sign', 'embedding', None], 'Invalid target mode'
@@ -66,6 +69,9 @@ class PhoenixDataset(torch.utils.data.Dataset):
         return video
 
     def get_video(self, idx):
+
+        if self.store_videos and idx in self.storage.keys():
+            return self.storage[idx]
         
         if 'video' in self.data[idx].keys():
             video = self.data[idx]['video']
@@ -85,6 +91,9 @@ class PhoenixDataset(torch.utils.data.Dataset):
         if video.shape[-1] == 3:
             # shape is probabaly (length, height, width, channels)
             video = video.permute(3, 0, 1, 2) # shape is now (channels, length, height, width). This is fast
+
+        if self.store_videos:
+            self.storage[idx] = video.clone()
             
         return video
     
