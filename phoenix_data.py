@@ -8,10 +8,17 @@ import gzip
 import pickle
 
 def data_from_file(filename):
-    with gzip.open(filename, 'rb') as f:
-        data = pickle.load(f)
+    is_gzip = False
+    with open(filename, 'rb') as f:
+        is_gzip = f.read(2) == b'\x1f\x8b'
+    if is_gzip:
+        with gzip.open(filename, 'rb') as f:
+            data = pickle.load(f)
+    else:
+        with open(filename, 'rb') as f:
+            data = pickle.load(f)
     return data
-
+    
 class PhoenixDataset(torch.utils.data.Dataset):
     def __init__(self,
         data,
