@@ -22,7 +22,8 @@ class PhoenixDataset(torch.utils.data.Dataset):
         normalize_mean=[0.43216, 0.394666, 0.37645], # from https://pytorch.org/docs/stable/torchvision/models.html#video-classification
         normalize_std=[0.22803, 0.22145, 0.216989],  # from https://pytorch.org/docs/stable/torchvision/models.html#video-classification
         resize_factor=1,
-        return_name=False
+        return_name=False,
+        video_filter=lambda v: True
         ):
         super(PhoenixDataset, self).__init__()
 
@@ -41,6 +42,7 @@ class PhoenixDataset(torch.utils.data.Dataset):
         self.normalize_std = torch.Tensor(normalize_std)[:, None, None, None]
         self.resize_factor = resize_factor
         self.return_name = return_name # If True, returns the 'name' attribute of the annotation
+        self.video_filter = video_filter
 
         assert self.source_mode in ['gloss', 'text', 'video', 'sign', 'embedding'], 'Invalid source mode'
         assert self.target_mode in ['gloss', 'text', 'video', 'sign', 'embedding', None], 'Invalid target mode'
@@ -56,7 +58,7 @@ class PhoenixDataset(torch.utils.data.Dataset):
         return video
 
     def get_video(self, idx):
-
+        
         if 'video' in self.data[idx].keys():
             video = self.data[idx]['video']
 
@@ -68,7 +70,17 @@ class PhoenixDataset(torch.utils.data.Dataset):
         if video.shape[-1] == 3:
             # shape is probabaly (length, height, width, channels)
             video = video.permute(3, 0, 1, 2) # shape is now (channels, length, height, width). This is fast
-
+            
+        return video
+    
+    def get_video_with_filter(self, idx):
+        
+        i = idx
+        while True:
+            video = self.get_video(i) # video should have shape (channels, length, height, width)
+            if self.video_filter(video):
+                break
+            i = torch.randint(low=0, high=self.__len__(), size=(1,)).item()
         return video
     
     def __getitem__(
@@ -85,7 +97,7 @@ class PhoenixDataset(torch.utils.data.Dataset):
         resize_factor = self.resize_factor if resize_factor is None else resize_factor
                 
         if self.source_mode == 'video':
-            src = self.get_video(idx)
+            src = self.get_video_with_filter(idx)
             if normalize:
                 src = self.rescale_video(src, normalize_mean, normalize_std)
             src = self.resize_video(src, resize_factor)
@@ -93,7 +105,7 @@ class PhoenixDataset(torch.utils.data.Dataset):
             src = self.data[idx][self.source_mode]
         
         if self.target_mode == 'video':
-            tgt = self.get_video(idx)
+            tgt = self.get_video_with_filter(idx)
             if normalize:
                 tgt = self.rescale_video(tgt, normalize_mean, normalize_std)
             tgt = self.resize_video(tgt, resize_factor)
