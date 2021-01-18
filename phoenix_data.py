@@ -6,6 +6,7 @@ import itertools
 import time
 import gzip
 import pickle
+import numpy as np
 
 def data_from_file(filename):
     is_gzip = False
@@ -18,7 +19,7 @@ def data_from_file(filename):
         with open(filename, 'rb') as f:
             data = pickle.load(f)
     return data
-    
+
 class PhoenixDataset(torch.utils.data.Dataset):
     def __init__(self,
         data,
@@ -71,8 +72,15 @@ class PhoenixDataset(torch.utils.data.Dataset):
 
         else:
             assert self.videos_root is not None, 'video not found in data, please provide a valid "videos_root"'
-            video_path = os.path.join(self.videos_root, self.data[idx]['name'] + '.mp4')
-            video, audio, info = torchvision.io.read_video(video_path)
+            video_path_mp4 = os.path.join(self.videos_root, self.data[idx]['name'] + '.mp4')
+            if os.path.isfile(video_path_mp4):
+                video, audio, info = torchvision.io.read_video(video_path_mp4)
+            else:
+                video_path_npy = os.path.join(self.videos_root, self.data[idx]['name'] + '.npy')
+                if os.path.isfile(video_path_npy):
+                    video = torch.from_numpy(np.load(video_path_npy))
+                else:
+                    raise FileNotFoundError(f'File {video_path_npy[:-4]}.mp4|npy not found')
 
         if video.shape[-1] == 3:
             # shape is probabaly (length, height, width, channels)
