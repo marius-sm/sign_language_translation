@@ -4,4 +4,8 @@ torch
 torchvision
 datasets
 tqdm
+tokenizers
+matplotlib
+gdown
 jupyter
+git+git://github.com/marius-sm/transformers@v4.1.1-release
