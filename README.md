@@ -1,5 +1,8 @@
 # Sign language translation
 
+#### ⚠ To compute BLEU on embeddings please use this fork
+`pip install git+git://github.com/marius-sm/transformers@v4.1.1-release`
+
 ## Training on embeddings2text
 ### Supervised pre-training
  - Embeddings from https://github.com/neccam/slt/ - Best accuracy in 20 epochs: 51.36
