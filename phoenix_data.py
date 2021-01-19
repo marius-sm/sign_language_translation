@@ -7,6 +7,8 @@ import time
 import gzip
 import pickle
 import numpy as np
+import imgaug.augmenters as iaa
+import imgaug
 
 def data_from_file(filename):
     is_gzip = False
@@ -20,6 +22,33 @@ def data_from_file(filename):
             data = pickle.load(f)
     return data
 
+
+
+def augment_video(video):
+    # video has shape (3, L, h, w)
+    
+    if isinstance(video, torch.Tensor):
+        video = video.permute(1, 2, 3, 0).numpy()
+    imgaug.seed(torch.randint(0, 99999999, size=(1,)).item())
+    aug = iaa.Sequential([  
+        iaa.Crop(percent=(0, 0.1)),
+        iaa.LinearContrast((0.75, 1.2)),
+        iaa.Multiply((0.75, 1.333), per_channel=0.5),
+        iaa.Affine(
+            scale={"x": (0.8, 1.2), "y": (0.8, 1.2)},
+            translate_percent={"x": (-0.1, 0.1), "y": (-0.1, 0.1)},
+            rotate=(-10, 10),
+            shear=(-10, 10)
+        )
+    ])
+    
+    aug_det = aug.to_deterministic()
+    results = np.zeros(video.shape,  video.dtype)
+    for i in range(video.shape[0]):
+        results[i] = aug_det.augment_image(video[i])
+        
+    return torch.from_numpy(results).permute(3, 0, 1, 2)
+
 class PhoenixDataset(torch.utils.data.Dataset):
     def __init__(self,
         data,
@@ -32,7 +61,8 @@ class PhoenixDataset(torch.utils.data.Dataset):
         resize_factor=1,
         return_name=False,
         video_filter=lambda v: True,
-        store_videos=False
+        store_videos=False,
+        transform=None
         ):
         super(PhoenixDataset, self).__init__()
 
@@ -54,6 +84,7 @@ class PhoenixDataset(torch.utils.data.Dataset):
         self.video_filter = video_filter
         self.store_videos = store_videos
         self.storage = {}
+        self.transform = transform
 
         assert self.source_mode in ['gloss', 'text', 'video', 'sign', 'embedding'], 'Invalid source mode'
         assert self.target_mode in ['gloss', 'text', 'video', 'sign', 'embedding', None], 'Invalid target mode'
@@ -71,7 +102,10 @@ class PhoenixDataset(torch.utils.data.Dataset):
     def get_video(self, idx):
 
         if self.store_videos and idx in self.storage.keys():
-            return self.storage[idx]
+            video = self.storage[idx]
+            if self.transform is not None:
+                return self.transform(video)
+            return video
         
         if 'video' in self.data[idx].keys():
             video = self.data[idx]['video']
@@ -95,6 +129,9 @@ class PhoenixDataset(torch.utils.data.Dataset):
         if self.store_videos:
             self.storage[idx] = video.clone()
             
+        if self.transform is not None:
+            return self.transform(video)
+        
         return video
     
     def get_video_with_filter(self, idx):
