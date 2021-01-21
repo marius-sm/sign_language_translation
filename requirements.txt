@@ -9,4 +9,5 @@ matplotlib
 gdown
 ipykernel
 jupyter
+imgaug
 git+git://github.com/marius-sm/transformers@v4.1.1-release
