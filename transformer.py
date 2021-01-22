@@ -15,7 +15,7 @@ from tqdm import tqdm
 def create_tokenizer(sentence_list):
     filename = f'temp_{time.strftime("%Y%m%d-%H%M%S")}.txt'
     with open(filename, 'w') as f:
-        for s in sentences:
+        for s in sentence_list:
             f.write(f'{s}\n')
 
     tokenizer = Tokenizer(WordPiece())
