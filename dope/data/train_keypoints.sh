@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-gdown https://drive.google.com/uc?id=12MniEkUWmecTlIY4-z2ry50BboyUE5Hn&export=download
-gdown https://drive.google.com/uc?id=1IOJsy7KWiz8VVaGiTwN1aQvIWDBqYd0e&export=download
-gdown https://drive.google.com/uc?id=1ujZSMMYEBWG89LwH-KUTMy1zU7e1s5ZU&export=download
-gdown https://drive.google.com/uc?id=1GICHwNxkmPdb5kAXMhaZhe1-MFYzAwH1&export=download
-gdown https://drive.google.com/uc?id=1-1x7TaCdBsWQ7OQIXeGtaP-voR-H_xB7&export=download
-gdown https://drive.google.com/uc?id=15amltpfWFCh5415Vk0LA3kviNSZXZsFn&export=download
-gdown https://drive.google.com/uc?id=1cPRYowihAWJuB-OtFHCCW0l9CSvjBe8q&export=download
-gdown https://drive.google.com/uc?id=1osUOypaeJTf7IBV2PoI2Q0aBkmI6WSvx&export=download
-gdown https://drive.google.com/uc?id=1sh7fTfHWm3DVuf3pbuNA5QvNJaDso3Ie&export=download
-gdown https://drive.google.com/uc?id=112GX24lmGVd03sVJMY_3wEcSoWi40WNU&export=download
-gdown https://drive.google.com/uc?id=1QVa-04s4P1dfBSyaT5ImkKb4Xh6hZqFH&export=download
-gdown https://drive.google.com/uc?id=14JVvriSgqCU481ciWxRih0iIznXNQyBn&export=download
-gdown https://drive.google.com/uc?id=1U8T31xkLLF9neypFD4npwhh_3xcvcrcw&export=download
-gdown https://drive.google.com/uc?id=1VL6-x77sjgE-RE109DRRWaV-fr9TaD59&export=download
+gdown "https://drive.google.com/uc?id=1EXSnqSYiNunfMq875qywoAfnc0EMkIxm&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1X4IEmY025UKltADgs1tJhUN2DzyuLfhI&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1vRNNDeb5NMmb1sCmU5IPCIWXZW6cOPoL&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1MtBUfg4Zs1P73KkhHHdDgL6lOW9s6tct&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=14qclqbqP7ekhPSsDGJjxQUsNxHiMGKh8&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1KxnTmqU-rotdHCS15Ld2h3tJ0W3aMtZr&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1V9Py0CINVGiso3GjYQF1pDXf3BBevspS&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1AJJvKwmIQV8KOUmAWwDqE_nKh0BxyPKD&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1JyCTQuk0Pi8nQ4aVT7RECsouSO0NgBFH&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1kdI33S5snrfVMbrUc_mGUfgN4OnRyMMi&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1aWHo0fZM0n4VF46iTxs22wNQ4Xp3u2EH&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1fcV-U5wfJqJtnVbmfH5z1p-C6whnGS8u&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1nVZEZb9NTgTw61lI0LRFPTQeWGGvjsfZ&export=download" --output sign_language_translation/dope/data/keypoints/train/
+gdown "https://drive.google.com/uc?id=1RyJA0WSagOAG509ATIXd7oGQGE7vsjcR&export=download" --output sign_language_translation/dope/data/keypoints/train/

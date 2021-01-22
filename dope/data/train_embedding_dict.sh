@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-gdown https://drive.google.com/uc?id=18XaEvLTZSwkV2nWr-U4oAm_Kh_eUO7UV&export=download
-gdown https://drive.google.com/uc?id=1FyHvYziRo5QGp0QUXyJIzPCxUDFMhU6o&export=download
-gdown https://drive.google.com/uc?id=1b3UUOzHF6RmvQ8_nQRqJrzmTMvzQGBPi&export=download
+gdown "https://drive.google.com/uc?id=11-E1SXY8E3mXr5yR-E03AltcmIq21zjD&export=download" --output sign_language_translation/dope/data/embeddings/
+gdown "https://drive.google.com/uc?id=15HJmHILdrnJMkLzETglt6Rj96gPStkE3&export=download" --output sign_language_translation/dope/data/embeddings/
+gdown "https://drive.google.com/uc?id=1PHQVwhQKCqXd6TsobpRcZ4YVZarGgSCW&export=download" --output sign_language_translation/dope/data/embeddings/
