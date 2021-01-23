@@ -39,6 +39,11 @@ def train_model(model,
         
     total_steps = 0
 
+    train_losses = []
+    train_accuracies = []
+    val_losses = []
+    val_accuracies = []
+
     for epoch in range(epochs):
 
         running_loss = 0.0
@@ -57,6 +62,8 @@ def train_model(model,
             if eval_every is not None and (i+1)%eval_every == 0:
                 valid_loss, valid_accuracy = evaluate_model(model, validloader, training_step_fn)
                 print(f'Validation accuracy {valid_accuracy:.4f}, loss {valid_loss:.4f}\n')
+                val_losses.append(valid_loss)
+                val_accuracies.append(valid_accuracy)
             
             if i == 0:
                 running_loader_time = time.time() - t0
@@ -79,6 +86,9 @@ def train_model(model,
             
             accuracy = num_correct_samples/num_samples
 
+            train_losses.append(mean_loss.item())
+            train_accuracies.append(accuracy.item())
+
             if i == 0:
                 running_loss = mean_loss.item()
                 running_accuracy = accuracy.item()
@@ -100,6 +110,8 @@ def train_model(model,
         if validloader is not None and eval_every is None:
             valid_loss, valid_accuracy = evaluate_model(model, validloader, training_step_fn)
             print(f'Validation accuracy {valid_accuracy:.4f}, loss {valid_loss:.4f}\n')
+            val_losses.append(valid_loss)
+            val_accuracies.append(valid_accuracy)
 
         on_epoch_end({
             'epoch': epoch,
@@ -110,3 +122,9 @@ def train_model(model,
         })
 
     print('Finished Training')
+
+    return train_losses, train_accuracies, val_losses, val_accuracies
+
+
+
+
