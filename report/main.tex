@@ -71,7 +71,7 @@ explain dataset
 
 Here we briefly present Sign Language Transformers \cite{neccam}. We adopt the same notations as in the paper. First, embeddings are extracted from each video frame using a 2D CNN
 $$f_{t}= \text{SpatialEmbedding} \left(I_{t}\right) \forall t\in[1, T]$$
-This sequence of embeddings is then passed through a Transformer encoder, producing a sequence of encoded spatial embeddings that are then mapped to glosses with a linear layer for sign language recognition. As the number of spatial embeddings may be different to the number of gloss tokens, the Connectionist Temporal Classification (CTC) loss is used. The output of the encoder (before the gloss prediction layer) is passed to the transformer decoder. The decoder maps also takes as input the target sentence, prepended with a beginning of sequence token, and is trained as in a classical autoregressive seq2seq model.
+This sequence of embeddings is then passed through a Transformer encoder, producing a sequence of encoded spatial embeddings that are then mapped to glosses with a linear layer for sign language recognition. As the number of spatial embeddings may be different from the number of gloss tokens, the Connectionist Temporal Classification (CTC) loss is used. The output of the encoder (before the gloss prediction layer) is passed to the transformer decoder. The decoder also takes as input the target sentence, prepended with a Start Of Sequence (SOS) token, and is trained as in a classical autoregressive seq2seq model. Therefore, Sign Language Transformers learn to predict glosses and sentences jointly.
 
 
 %-------------------------------------------------------------------------
@@ -94,8 +94,15 @@ The goal of this task is to predict the order of different clips in a video. Mor
 \section{Experiments}
 \subsection{Implementation}
 
-To have more flexibility, we re-implement\footnote{\url{https://github.com/marius-sm/sign_language_translation}} Sign Language Transformers \cite{neccam} using Pytorch and HuggingFace transformers \cite{huggingface}. In all our experiments, we use a R(2+1)D \cite{r2plus1} pre-trained on the Kinetics-400 \cite{kinetics} dataset from the Torchvision library as our 3D feature extractor.
-To learn the arrow of time, we use clips of 8 frames and train with a batch size of 32. We optimize our network with Adam. For clip order prediction, we exatract 8 clips from each video with intervals of 8 frames. We train with a batch size of 8. We optimize both networks with Adam and a low learning rate of $10^{-5}$ to avoid destroying the Kinetics-400 features.
+To have more flexibility, we re-implement\footnote{\url{https://github.com/marius-sm/sign_language_translation}} Sign Language Transformers \cite{neccam} using Pytorch and HuggingFace transformers \cite{huggingface}. In all our experiments, we use a R(2+1)D \cite{r2plus1} pre-trained on the Kinetics-400 \cite{kinetics} dataset from the Torchvision library as our 3D feature extractor. The last convolutional layer produces 512 channels. Whenever necessary, we average-pool the features to produce embeddings.
+
+To learn the arrow of time, we use clips of 8 frames and train with a batch size of 32. For clip order prediction, we exatract 8 clips from each video with intervals of 8 frames and train with a batch size of 8. We optimize both networks with Adam and a low learning rate of $10^{-5}$ to avoid destroying the Kinetics-400 features.
+
+We had initialy planned to pool our features only along the spatial dimensions. That is, a video of length $T$ results in a sequence
+
+\subsection{Qualitative assessments}
+To assess the qualit of our embeddings, 
+
 \subsection{Mathematics}
 
 Please number all of your sections and displayed equations.  It is
