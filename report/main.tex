@@ -60,51 +60,40 @@ Clément Grisi\\
 \section{Introduction}
 
 %-------------------------------------------------------------------------
-\subsection{Sign language translation}
+\subsection{Sign Language Translation}
 Sign language
 Sign language translation can be done in either way: production of sign language from text, or translation of sign language 
 
+explain Sign2Text, Gloss2Text, Sign2Gloss2Text, Sign2(Gloss+Text)
 
-\subsection{Sign language transformers}
 
-Please refer to the author guidelines on the \confYear~web page for a
-discussion of the policy on dual submissions.
+\subsection{Sign Language Transformers}
 
-\subsection{Paper length}
-Papers, excluding the references section,
-must be no longer than eight pages in length. The references section
-will not be included in the page count, and there is no limit on the
-length of the references section. For example, a paper of eight pages
-with two pages of references would have a total length of 10 pages.
-{\bf There will be no extra page charges for \confYear.}
+Here we briefly present Sign Language Transformers \cite{neccam}. We adopt the same notations as in the paper. First, embeddings are extracted from each video frame using a 2D CNN
+$$f_{t}= \text{SpatialEmbedding} \left(I_{t}\right) \forall t\in[1, T]$$
+This sequence of embeddings is then passed through a Transformer encoder, producing a sequence of encoded spatial embeddings that are then mapped to glosses with a linear layer for sign language recognition. As the number of spatial embeddings may be different to the number of gloss tokens, the Connectionist Temporal Classification (CTC) loss is used. The output of the encoder (before the gloss prediction layer) is passed to the transformer decoder. The decoder maps also takes as input the target sentence, prepended with a beginning of sequence token, and is trained as in a classical autoregressive seq2seq model.
 
-Overlength papers will simply not be reviewed.  This includes papers
-where the margins and formatting are deemed to have been significantly
-altered from those laid down by this style guide.  Note that this
-\LaTeX\ guide already sets figure captions and references in a smaller font.
-The reason such papers will not be reviewed is that there is no provision for
-supervised revisions of manuscripts.  The reviewing process cannot determine
-the suitability of the paper for presentation in eight pages if it is
-reviewed in eleven.  
 
 %-------------------------------------------------------------------------
-\subsection{The ruler}
-The \LaTeX\ style defines a printed ruler which should be present in the
-version submitted for review.  The ruler is provided in order that
-reviewers may comment on particular lines in the paper without
-circumlocution.  If you are preparing a document using a non-\LaTeX\
-document preparation system, please arrange for an equivalent ruler to
-appear on the final output pages.  The presence or absence of the ruler
-should not change the appearance of any other content on the page.  The
-camera ready copy should not contain a ruler. 
-(\LaTeX\ users may use options of cvpr.cls to switch between different 
-versions.)  
-Reviewers:
-note that the ruler measurements do not align well with lines in the paper
---- this turns out to be very difficult to do well when the paper contains
-many figures and equations, and, when done, looks ugly.  Just use fractional
-references (e.g.\ this line is $095.5$), although in most cases one would
-expect that the approximate location will be adequate.
+\section{Video Representations}
+\subsection{Spatial Embeddings}
+
+In \cite{neccam}, the spatial embeddings are extracted from a pre-trained 2D CNN. Notably, the 2D CNN they use for their experiments is pre-trained on sign language video \cite{hmm}. The authors of \cite{neccam} showed that this is crucial to achieve good performance, as embeddings extrated from an EfficientNet \cite{effnet} pre-trained on ImageNet are substentially worse on the Sign2Gloss task (the reported WER is almost halved).
+It is worth noting that this 2D CNN feature extractor is not trained jointly with the Sign Language Transformer.
+\subsection{Spatio-Temporal Embeddings}
+We investigate replacing the 2D CNN by a 3D CNN. Our goal is to pre-train this 3D CNN to extract good representations of sign language videos for the Sign2Text task. Training it end-to-end with the Sign Language Transformer is difficult because this requires a lot of GPU memory. Indeed, the input videos have up to 475 frames and cannot easily be split into multiple part since the target is a sentence. Although it one possibility would be to reduce the framerate, we prefer to experiment with techniques that do not require textual targets. We experiment with several self-supervised pre-training tasks.
+\subsection{Self-Supervised Learning of Video Representations}
+Recently, there has been a growing interest in self-supervised learning for image, video, audio or text data. Self-supervised learning allows to leverage large quantities of unlabeled data. Multiple approaches have been explored for self-supervised learning from videos. We explore two of them: predicting if a video is played forward or backward \cite{arrow} and predicting the order of shuffled clips \cite{vcop}. Other approaches include learning from temporaly modified videos \cite{playback-rate, pace, temp-trans}, learning to predict the future \cite{pred-coding} and contrastive learning \cite{bert-video}.
+\subsubsection{Predicting the Arrow of Time}
+It has been shown \cite{arrow} that learning to predict if a video clip is played forward or backward can be useful to learn good representations of videos. Our intuition tells us that this mask may be particularly adapted for learning high-level representations of sign language videos because it is very hard to solve for humans that do not know sign language.
+
+\subsubsection{Clip Order Prediction}
+The goal of this task is to predict the order of different clips in a video. More specifically, given some video, several non overlapping clips are extracted. Each of them is then passed 
+
+\subsubsection{Easy clues}
+
+\section{Experiments}
+\subsection{Implementation}
 
 \subsection{Mathematics}
 
@@ -173,7 +162,7 @@ If you are making a submission to another conference at the same time,
 which covers similar or overlapping material, you may need to refer to that
 submission in order to explain the differences, just as you would if you
 had previously published related work.  In such cases, include the
-anonymized parallel submission~\cite{Authors14} as additional material and
+
 cite it as
 \begin{quote}
 [1] Authors. ``The frobnicatable foo filter'', F\&G 2014 Submission ID 324,
@@ -185,7 +174,7 @@ found elsewhere, and refer them to a technical report.  For conference
 submissions, the paper must stand on its own, and not {\em require} the
 reviewer to go to a techreport for further details.  Thus, you may say in
 the body of the paper ``further details may be found
-in~\cite{Authors14b}''.  Then submit the techreport as additional material.
+
 Again, you may not assume the reviewers will read this material.
 
 Sometimes your paper is about a problem which you tested using a tool which
@@ -252,27 +241,14 @@ Compare the following:\\
  \verb'$\mathit{conf}_a$' & $\mathit{conf}_a$
 \end{tabular}\\
 See The \TeX book, p165.
-
 The space after \eg, meaning ``for example'', should not be a
 sentence-ending space. So \eg is correct, {\em e.g.} is not.  The provided
 \verb'\eg' macro takes care of this.
-
 When citing a multi-author paper, you may save space by using ``et alia'',
 shortened to ``\etal'' (not ``{\em et.\ al.}'' as ``{\em et}'' is a complete word.)
 However, use it only when there are three or more authors.  Thus, the
 following is correct: ``
-   Frobnication has been trendy lately.
-   It was introduced by Alpher~\cite{Alpher02}, and subsequently developed by
-   Alpher and Fotheringham-Smythe~\cite{Alpher03}, and Alpher \etal~\cite{Alpher04}.''
 
-This is incorrect: ``... subsequently developed by Alpher \etal~\cite{Alpher03} ...''
-because reference~\cite{Alpher03} has just two authors.  If you use the
-\verb'\etal' macro provided, then you need not worry about double periods
-when used at the end of a sentence as in Alpher \etal.
-
-For this citation style, keep multiple citations in numerical (not
-chronological) order, so prefer \cite{Alpher03,Alpher02,Authors14} to
-\cite{Alpher02,Alpher03,Authors14}.
 
 
 \begin{figure*}
@@ -377,7 +353,7 @@ which it is referenced. Use Times 8-point type, single-spaced.
 List and number all bibliographical references in 9-point Times,
 single-spaced, at the end of your paper. When referenced in the text,
 enclose the citation number in square brackets, for
-example~\cite{Authors14}.  Where appropriate, include the name(s) of
+
 editors of referenced books.
 
 \begin{table}
