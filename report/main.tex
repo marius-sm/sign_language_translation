@@ -61,10 +61,10 @@ Clément Grisi\\
 
 %-------------------------------------------------------------------------
 \subsection{Sign Language Translation}
-Sign language
-Sign language translation can be done in either way: production of sign language from text, or translation of sign language 
 
 explain Sign2Text, Gloss2Text, Sign2Gloss2Text, Sign2(Gloss+Text)
+
+explain dataset
 
 
 \subsection{Sign Language Transformers}
@@ -81,20 +81,21 @@ This sequence of embeddings is then passed through a Transformer encoder, produc
 In \cite{neccam}, the spatial embeddings are extracted from a pre-trained 2D CNN. Notably, the 2D CNN they use for their experiments is pre-trained on sign language video \cite{hmm}. The authors of \cite{neccam} showed that this is crucial to achieve good performance, as embeddings extrated from an EfficientNet \cite{effnet} pre-trained on ImageNet are substentially worse on the Sign2Gloss task (the reported WER is almost halved).
 It is worth noting that this 2D CNN feature extractor is not trained jointly with the Sign Language Transformer.
 \subsection{Spatio-Temporal Embeddings}
-We investigate replacing the 2D CNN by a 3D CNN. Our goal is to pre-train this 3D CNN to extract good representations of sign language videos for the Sign2Text task. Training it end-to-end with the Sign Language Transformer is difficult because this requires a lot of GPU memory. Indeed, the input videos have up to 475 frames and cannot easily be split into multiple part since the target is a sentence. Although it one possibility would be to reduce the framerate, we prefer to experiment with techniques that do not require textual targets. We experiment with several self-supervised pre-training tasks.
+We investigate replacing the 2D CNN by a 3D CNN. Our goal is to pre-train this 3D CNN to extract good representations of sign language videos for the Sign2Text task. Training it end-to-end with the Sign Language Transformer is difficult because this requires a lot of GPU memory. Indeed, the input videos can have many frames (up to 475 in the PHOENIX-2014T \cite{phoenix} dataset) and cannot easily be split into multiple part since they are paired with a sentence. Although one possibility would be to reduce the framerate, we prefer to experiment with techniques that do not require textual targets. We experiment with several self-supervised pre-training tasks.
 \subsection{Self-Supervised Learning of Video Representations}
-Recently, there has been a growing interest in self-supervised learning for image, video, audio or text data. Self-supervised learning allows to leverage large quantities of unlabeled data. Multiple approaches have been explored for self-supervised learning from videos. We explore two of them: predicting if a video is played forward or backward \cite{arrow} and predicting the order of shuffled clips \cite{vcop}. Other approaches include learning from temporaly modified videos \cite{playback-rate, pace, temp-trans}, learning to predict the future \cite{pred-coding} and contrastive learning \cite{bert-video}.
-\subsubsection{Predicting the Arrow of Time}
-It has been shown \cite{arrow} that learning to predict if a video clip is played forward or backward can be useful to learn good representations of videos. Our intuition tells us that this mask may be particularly adapted for learning high-level representations of sign language videos because it is very hard to solve for humans that do not know sign language.
+Recently, there has been a growing interest in self-supervised learning for image, video, audio or text data. Self-supervised learning allows to leverage large quantities of unlabeled data. Multiple approaches have been explored for self-supervised learning from videos. We explore two of them: predicting whether a video is played forward or backward \cite{arrow} and predicting the order of shuffled clips \cite{vcop}. Other approaches include learning from temporaly modified videos \cite{playback-rate, pace, temp-trans}, learning to predict the future \cite{pred-coding} and contrastive learning \cite{bert-video}.
+\subsubsection{Learning from the Arrow of Time}
+It has been shown \cite{arrow} that learning to predict if a video clip is played forward or backward can be useful to learn good representations of videos. Our intuition tells us that this task may be particularly well adapted for learning high-level representations of sign language videos since it is very hard to solve for humans that do not know sign language.
 
-\subsubsection{Clip Order Prediction}
-The goal of this task is to predict the order of different clips in a video. More specifically, given some video, several non overlapping clips are extracted. Each of them is then passed 
+\subsubsection{Predicting the Order of Shuffled Clips}
+The goal of this task is to predict the order of different clips in a video. More specifically, given some video, several (in general, 3) non-overlapping clips are extracted. A random permutation is chosen (in the case of 3 clips, there are 6 possible permutations). Each of them is then passed through the 3D CNN and average-pooled to a feature vector. The feature vectors of all the clips are concatenated and passed through a 2-layer MLP-like neural network, which predicts the permutation of the clips. Intuitively, only high-level features allow to predict the order of non-overlapping clips.
 
-\subsubsection{Easy clues}
 
 \section{Experiments}
 \subsection{Implementation}
 
+To have more flexibility, we re-implement\footnote{\url{https://github.com/marius-sm/sign_language_translation}} Sign Language Transformers \cite{neccam} using Pytorch and HuggingFace transformers \cite{huggingface}. In all our experiments, we use a R(2+1)D \cite{r2plus1} pre-trained on the Kinetics-400 \cite{kinetics} dataset from the Torchvision library as our 3D feature extractor.
+To learn the arrow of time, we use clips of 8 frames and train with a batch size of 32. We optimize our network with Adam. For clip order prediction, we exatract 8 clips from each video with intervals of 8 frames. We train with a batch size of 8. We optimize both networks with Adam and a low learning rate of $10^{-5}$ to avoid destroying the Kinetics-400 features.
 \subsection{Mathematics}
 
 Please number all of your sections and displayed equations.  It is
