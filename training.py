@@ -99,7 +99,7 @@ def train_model(model,
                 running_batch_time = running_batch_time * alpha + (1-alpha) * (time.time() - t0)
                 
             if i%print_every == print_every-1:
-                print(f'Epoch {epoch}, iteration {i}/{len(trainloader)}: running loss {running_loss:.4f}, running acc {running_accuracy:.4f}, batch loss: {mean_loss.item():.4f}, batch acc: {accuracy.item():.4f}, running time per batch: {running_batch_time:.4f}s (model) {running_loader_time:.4f}s (loader)')
+                print(f'Epoch {epoch}, iteration {i+1}/{len(trainloader)}: running loss {running_loss:.4f}, running acc {running_accuracy:.4f}, batch loss: {mean_loss.item():.4f}, batch acc: {accuracy.item():.4f}, running time per batch: {running_batch_time:.4f}s (model) {running_loader_time:.4f}s (loader)')
         
             t0 = time.time()
         
