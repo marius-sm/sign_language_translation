@@ -91,16 +91,17 @@ It has been shown \cite{arrow} that learning to predict if a video clip is playe
 The goal of this task is to predict the order of different clips in a video. More specifically, given some video, several (in general, 3) non-overlapping clips are extracted. A random permutation is chosen (in the case of 3 clips, there are 6 possible permutations). Each of them is then passed through the 3D CNN and average-pooled to a feature vector. The feature vectors of all the clips are concatenated and passed through a 2-layer MLP-like neural network, which predicts the permutation of the clips. Intuitively, only high-level features allow to predict the order of non-overlapping clips.
 
 
+\subsection{DOPE features}
+
 \section{Experiments}
 \subsection{Implementation}
 
-To have more flexibility, we re-implement\footnote{\url{https://github.com/marius-sm/sign_language_translation}} Sign Language Transformers \cite{neccam} using Pytorch and HuggingFace transformers \cite{huggingface}. In all our experiments, we use a R(2+1)D \cite{r2plus1} pre-trained on the Kinetics-400 \cite{kinetics} dataset from the Torchvision library as our 3D feature extractor. The last convolutional layer produces 512 channels. Whenever necessary, we average-pool the features to produce embeddings.
+To have more flexibility, we re-implement\footnote{\url{https://github.com/marius-sm/sign_language_translation}} Sign Language Transformers \cite{neccam} using Pytorch and HuggingFace transformers \cite{huggingface}. In all our experiments, we use a R(2+1)D \cite{r2plus1} pre-trained on the Kinetics-400 \cite{kinetics} dataset from the Torchvision library as our 3D feature extractor. The last convolutional layer produces 512 channels. Whenever necessary, we average-pool those channels to produce embeddings.
 
-To learn the arrow of time, we use clips of 8 frames and train with a batch size of 32. For clip order prediction, we exatract 8 clips from each video with intervals of 8 frames and train with a batch size of 8. We optimize both networks with Adam and a low learning rate of $10^{-5}$ to avoid destroying the Kinetics-400 features.
+To learn the arrow of time, we use clips of 8 frames and train with a batch size of 32. For clip order prediction, we extract 8 clips from each video with intervals of 8 frames and train with a batch size of 8. We optimize both networks with Adam and a low learning rate of $10^{-5}$ to avoid destroying the Kinetics-400 features.
 
-We had initialy planned to pool our features only along the spatial dimensions. That is, a video of length $T$ results in a sequence
-
-\subsection{Qualitative assessments}
+Once trained, we use these networks to extract the embeddings from all videos. As the dataset videos have significantly more than 8 frames,  extracting the embeddings of a video in a single pass results in a strong train/test discrepancy. To adress this issue, we instead subdivide each video in chunks of 8 frames and extract the embedding of each chunk independently.
+\subsection{Qualitative assessments of the embeddings}
 After pooling the feature along spatial dimensions, we obtain a sequence of spatial embeddings
 $$f_t, t\in[1, ..., \tilde{T}]$$
 where $\tilde{T}\leq T$ ($T$ is the number of frames of the input video). For a 2D CNN, $T=\tilde{T}$ whereas R(2+1)D has a temporal stride of $8$, resulting in $\tilde{T} = \lceil T/8 \rceil$.
@@ -112,6 +113,8 @@ That is, we compare the embeddings of a given video with the other embeddings of
 	\item matrix $A$ to look like a diagonal matrix, where temporaly close frames have similar embeddings, but frames that are far appart have disimilar embeddings, so that there is enough information to recover the translation
 	\item matrix $B$ to not have many values close to $1$ as two different videos probably don't translate to related sentences.
 \end{itemize}
+
+We first visualize the embeddings of a the 2D CNN pre-trained on sign language data.
 
 \subsection{Mathematics}
 
