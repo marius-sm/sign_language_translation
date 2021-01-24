@@ -15,6 +15,8 @@
 \captionsetup{compatibility=false}
 \usepackage{array}
 \usepackage{booktabs}
+\usepackage{float}
+\usepackage{footnote}
 % Include other packages here, before hyperref.
 
 % If you comment hyperref and then uncomment it, you should delete
@@ -127,22 +129,26 @@ That is, we compare the embeddings of a given video with the other embeddings of
 
 We first visualize the embeddings of a the 2D CNN pre-trained on sign language data.
 \subsection{Influence of Body Keypoints}
-put results + show matrices\\
-\begin{table}[h]
+
+We summarize hereunder the translation performances we observed when feeding the network additionnal body keypoints inputs. Table \ref{tab:embeddings} shows the performances when concatenating the 2D CNN embeddings from \cite{neccam} with the pooling embeddings extracted from each video frame with DOPE.
+\begin{table}[H]
 \centering
 \begin{tabular}{*5c}
 	\toprule
 	Input &  \multicolumn{4}{c}{DEV}\\
 	\midrule
 	{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
-	Neccam   &  45.54 & 32.60  & 25.30  & 20.69\\
+	Neccam   &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
 	+avg   &  46.61 & 33.17   & 25.21  & 20.09\\
 	+max   &  45.98  &  32.44   & 24.79  & 19.99\\
+	+amax  &  \textbf{47.31} &  \textbf{33.34}   & 25.07  & 19.81\\
+	+max+amax  &  44.32 & 31.50  & 24.09  & 19.27\\
 	\bottomrule
 \end{tabular}
 \caption{Sign2Text with additional Pooling Embeddings}
+\label{tab:embeddings}
 \end{table}
-
+Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the performances of the five best experiments obtained when concatenating the same 2D CNN embeddings with the 2D (resp. 3D) body keypioints extracted using DOPE. While the 2D keypoints had to be normalized by the mean and standard deviation of the corresponding body part, the 3D keypoints were already between $0$ and $1$ hence didn't need to be normalized. 
 \begin{table}[h]
 	\centering
 	\begin{tabular}{*5c}
@@ -150,13 +156,16 @@ put results + show matrices\\
 		Input &  \multicolumn{4}{c}{DEV}\\
 		\midrule
 		{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
-		Neccam   &  45.54 & 32.60  & 25.30  & 20.69\\
+		Neccam   &  45.54 & \textbf{32.60}  & \textbf{25.30}  & \textbf{20.69}\\
 		+hand\_2d   &  45.66 & 32.52   & 24.79  & 19.18\\
 		+face\_2d   &  46.06  &  32.44   & 24.63  & 19.61\\
 		+body\_2d   &  45.73 &  32.04   & 24.34  & 19.53\\	
+		+fh\_2d\footnotemark[3]  &  45.53 &  32.21  & 24.31  & 19.34\\	
+		+fhb\_2d\footnotemark[4] &  \textbf{46.09} &  32.16   & 23.96  & 18.75\\	
 		\bottomrule
 	\end{tabular}
 	\caption{Sign2Text with additional 2D Keypoints}
+	\label{tab:2d_keypoints}
 \end{table}
 
 \begin{table}[h]
@@ -166,17 +175,21 @@ put results + show matrices\\
 		Input &  \multicolumn{4}{c}{DEV}\\
 		\midrule
 		{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
-		Neccam   &  45.54 & 32.60  & 25.30  & 20.69\\
+		Neccam   &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
 		+hand\_3d   &  46.19 & 32.49   & 24.24  & 18.92\\
 		+face\_3d   &  45.56  &  32.10 & 24.27  & 19.27\\
 		+body\_3d   &  44.96 &  31.96   & 24.32  & 19.46\\	
+		+fh\_3d\footnotemark[3]  &  \textbf{46.37} &  \textbf{32.83}   & 24.88  & 19.72\\	
+		+fhb\_3d\footnotemark[4]  &  46.09 &  32.34   & 24.00  & 18.85\\	
 		\bottomrule
 	\end{tabular}
 	\caption{Sign2Text with additional 3D Keypoints}
+	\label{tab:3d_keypoints}
 \end{table}
+\footnotetext[3]{face+hand keypoints} 
+\footnotetext[4]{face+hand+body keypoints}
 
-explain that poor results were due to DOPE performing poorly on PHEONIX datasets\\
-add comment for future work: use part experts?
+No matter what combination of additional inputs we fed the network, we didn't witness any significative improvement in translation performances. This is mainly due to DOPE performing relatively poorly on the PHOENIX-2014T dataset. Even though it manages to identify body keypoints in almost every single frames, it only rarely detects the signer's face and hands (Figure \ref{fig:pie_charts}). Hence, we're mostly adding noise to the 2D CNN embeddings. Instead of using a single model for whole-body pose estimation, one could try using indepedant hand, face and body experts to detect more precisely each part of the signer's expression.
 
 \begin{figure}[h]
 	\centering
