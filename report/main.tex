@@ -130,7 +130,7 @@ That is, we compare the embeddings of a given video with the other embeddings of
 We first visualize the embeddings of a the 2D CNN pre-trained on sign language data.
 \subsection{Influence of Body Keypoints}
 
-We summarize hereunder the translation performances we observed when feeding the network additionnal body keypoints inputs. Table \ref{tab:embeddings} shows the performances when concatenating the 2D CNN embeddings from \cite{neccam} with the pooling embeddings extracted from each video frame with DOPE.
+We summarize hereunder the translation performances observed on PHOENIX-2014T dev dataset when feeding the network additionnal body keypoints inputs. Table \ref{tab:embeddings} shows the performances when concatenating the 2D CNN embeddings from \cite{neccam} with the pooling embeddings extracted from each video frame with DOPE.
 \begin{table}[H]
 \centering
 \begin{tabular}{*5c}
@@ -189,7 +189,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 \footnotetext[3]{face+hand keypoints} 
 \footnotetext[4]{face+hand+body keypoints}
 
-No matter what combination of additional inputs we fed the network, we didn't witness any significative improvement in translation performances. This is mainly due to DOPE performing relatively poorly on the PHOENIX-2014T dataset. Even though it manages to identify body keypoints in almost every single frames, it only rarely detects the signer's face and hands (Figure \ref{fig:pie_charts}). Hence, we're mostly adding noise to the 2D CNN embeddings. Instead of using a single model for whole-body pose estimation, one could try using indepedant hand, face and body experts to detect more precisely each part of the signer's expression.
+No matter what combination of additional inputs we fed the network, we didn't witness any significative improvement in translation performances. This is mainly due to DOPE performing relatively poorly on the PHOENIX-2014T dev dataset. Even though it manages to identify body keypoints in almost every single frames, it only rarely detects the signer's face and hands (Figure \ref{fig:pie_charts}). Hence, we're mostly adding noise to the 2D CNN embeddings. Instead of using a single model for whole-body pose estimation, one could try using indepedant hand, face and body experts to detect more precisely each part of the signer's expression.
 
 \begin{figure}[h]
 	\centering
