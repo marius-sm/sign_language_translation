@@ -63,9 +63,7 @@ According to the World Health Organization, over 5\% of the world’s population
 
 Sign language translation is a very challenging task and has been an active field of
 research for the past two decades. Most of the research conducted to date has focused on sign language recognition (SLR), that is recognizing the sequence of sign glosses \footnote{sign glosses are spoken language words matching the meaning of signs}, ignoring the linguistic properties of the sign language and assuming that there is a one-to-one mapping to spoken words. Recent advances have tried to tackle sign language translation (SLT), that is the full mapping from signs to spoken words.
-\\
-explain Sign2Text, Gloss2Text, Sign2Gloss2Text, Sign2(Gloss+Text)
-explain dataset
+Given the complexity of the end-to-end sign language video to spoken language sentence translation task (Sign2Text), people have introduced intermediate subtasks to bridge the gap between sign language recognition -- recognizing glosses -- and full translation. A combination of these subtasks, the Sign2Gloss2Text approach, used to be state-of-the-art. It consists in training a Sign2Gloss model to extract gloss sequences from sign language videos, which are then used to solve the translation task as a text-to-text problem by separately training a Gloss2Text model. However, the mid-level gloss representation introduces an information bottleneck. Joint learning of continuous sign language recognition and translation (Sign2(Gloss+Text)), was designed to overcome this bottleneck. We evaluate our approach on the recently released PHOENIX14T dataset \cite{phoenix}, which contains parallel sign language videos, gloss annotations and their translations.
 \subsection{Sign Language Transformers}
 Here we briefly present the Sign Language Transformers model introduced in \cite{neccam}. We adopt the same notations as in the paper. First, embeddings are extracted from each video frame using a 2D CNN
 $$f_{t}= \text{SpatialEmbedding} \left(I_{t}\right) \forall t\in[1, T]$$
