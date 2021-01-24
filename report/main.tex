@@ -89,9 +89,9 @@ It has been shown \cite{arrow} that learning to predict if a video clip is playe
 The goal of this task is to predict the order of different clips in a video. More specifically, given some video, several (in general, 3) non-overlapping clips are extracted. A random permutation is chosen (in the case of 3 clips, there are 6 possible permutations). Each of them is then passed through the 3D CNN and average-pooled to a feature vector. The feature vectors of all the clips are concatenated and passed through a 2-layer MLP-like neural network, which predicts the permutation of the clips. Intuitively, only high-level features allow to predict the order of non-overlapping clips.
 \subsection{Human Keypoint Estimation}
 \subsubsection{Modelling the Body Pose}
-Sign language being visual, signers rely on multiple complementaty channels to convey information. These can be grouped into two main categories: manual and non-manual features. Manual features mainly correspond to the hand shape and its motion through time. Although these can be considered as the dominant part of the sign morphology, they alone do not encapsulate the full context of the conveyed information. To give clarity, emphasis and additional meaning, signers use non-manual features, such as facial expressions, mouth gesture, mouthings and body pose. This motivates our work to investigate whether explicitly modelling the body pose (hands, face, upper body) could benefit neural sign language translation.
-\subsubsection{Whole-body 3D Pose Estimation}
-In order to extract 2D and 3D body keypoints, we applied a pre-trained version of DOPE \cite{dope} to each frame in the PHOENIX-2014T dataset (Figure \ref{fig:2d_3d}). We slighltly modified the code provided by the authors in order to extract for each frame the 2D and 3D whole-body keypoints (face, hands, body) as well as various pooling embeddings (average pooling, max pooling, argmax pooling). The obtained human keypoints were normalized by the mean and standard deviation of the corresponding body part and used as additional input to our sign language transformer model, together with the pooling embeddings.
+Sign language being visual, signers rely on multiple complementaty channels to convey information. These can be grouped into two main categories: manual and non-manual features. Manual features mainly correspond to the hand shape and its motion through time. Although these are often considered as the governing part of the sign morphology, they alone do not enclose the full context of the conveyed information. To give clarity, add precisions and nuance their words, signers use non-manual features, such as facial expressions, mouth gesture and body pose. This motivates our work to investigate whether explicitly modelling the body pose (hands, face, upper body) could benefit neural sign language translation.
+\subsubsection{Body Keypoints as Additional Inputs}
+In order to extract 2D and 3D body keypoints, we applied a pre-trained version of DOPE \cite{dope} to each frame in the PHOENIX-2014T dataset (Figure \ref{fig:2d_3d}). We slighltly modified the code provided by the authors by adding three pooling layers on top of the ResNet50 backbone (average pooling, max pooling, argmax pooling). This allowed us to extract 2D and 3D whole-body keypoints (face, hands, body) as well as three pooling embeddings for each frame of the PHOENIX-2014T dataset. The obtained human keypoints were normalized by the mean and standard deviation of the corresponding body part and used as additional input to our sign language transformer model, together with the pooling embeddings.
 
 \begin{figure}[h]
 	\begin{subfigure}[h]{0.5\linewidth}
@@ -112,9 +112,6 @@ In order to extract 2D and 3D body keypoints, we applied a pre-trained version o
 	\caption{DOPE Results on  PHOENIX-2014T}
 	\label{fig:pie_charts}
 \end{figure}
-
-
-\subsection{DOPE features}
 
 \section{Experiments}
 \subsection{Implementation}
