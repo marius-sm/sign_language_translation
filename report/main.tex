@@ -101,7 +101,17 @@ To learn the arrow of time, we use clips of 8 frames and train with a batch size
 We had initialy planned to pool our features only along the spatial dimensions. That is, a video of length $T$ results in a sequence
 
 \subsection{Qualitative assessments}
-To assess the qualit of our embeddings, 
+After pooling the feature along spatial dimensions, we obtain a sequence of spatial embeddings
+$$f_t, t\in[1, ..., \tilde{T}]$$
+where $\tilde{T}\leq T$ ($T$ is the number of frames of the input video). For a 2D CNN, $T=\tilde{T}$ whereas R(2+1)D has a temporal stride of $8$, resulting in $\tilde{T} = \lceil T/8 \rceil$.
+To assess the quality of our embeddings, we visualize their cosine similarities. Given two videos $v^1$ and $v^2$ and their spatial embeddings sequences $f_t^1, t\in\{1, ..., \tilde{T}^1\}$ and $f_u^2, u\in \{1, ...,  \tilde{T}^2\}$, we compute the matrices $A$ and $B$:
+$$A_{tu} = \frac{{f_t^1}^\intercal f_{t'}^1}{\lVert f_t^1 \rVert \lVert f_{t'}^1 \rVert}, \quad\forall t, t' \in\{1, ..., \tilde{T}^1\}$$
+$$B_{tu} = \frac{{f_t^1}^\intercal f_u^2}{\lVert f_t^1 \rVert \lVert f_u^2 \rVert}, \quad \forall t \in\{1, ..., \tilde{T}^1\}, u \in\{1, ..., \tilde{T}^2\}$$
+That is, we compare the embeddings of a given video with the other embeddings of the same video (matrix $A$) and with the embeddings of another video (matrix $B$). Intuitively, we want 
+\begin{itemize}
+	\item matrix $A$ to look like a diagonal matrix, where temporaly close frames have similar embeddings, but frames that are far appart have disimilar embeddings, so that there is enough information to recover the translation
+	\item matrix $B$ to not have many values close to $1$ as two different videos probably don't translate to related sentences.
+\end{itemize}
 
 \subsection{Mathematics}
 
