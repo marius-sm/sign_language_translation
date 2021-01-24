@@ -13,6 +13,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{subcaption}
 \captionsetup{compatibility=false}
+\usepackage{array}
+\usepackage{booktabs}
 % Include other packages here, before hyperref.
 
 % If you comment hyperref and then uncomment it, you should delete
@@ -48,26 +50,22 @@ Clément \textsc{Grisi}\\
 \maketitle
 
 
-%%%%%%%%% ABSTRACT
 \begin{abstract}
-   abstract
-   \vspace{5cm}
+	Sign Language Transformers \cite{neccam}, the current state-of-the-art in sign language translation, leverages a Transformer-based encoder-decoder architecture with intermediate gloss supervision to jointly learn continuous sign language recognition and translaton. We investigated two avenues for improving the results presented in \cite{neccam}. First, we slightly modified the Sign Language Transformers pipeline by replacing the 2D CNN with a 3D CNN, better suited for processing videos. Then, we trained the Transformer-based model with additional human keypoint inputs. Although our experiments weren't conclusive, we have laid the foundation for future work and strongly believe their is room for improvement. 
 \end{abstract}
 
-%%%%%%%%% BODY TEXT
 \section{Introduction}
+According to the World Health Organization, over 5\% of the world’s population -- around 466 million people – are deaf or suffer from disabling hearing loss \cite{WHO}. For many of these individuals, sign language is their primary mean of communication. Despite widespread misconceptions, sign language has its own set of linguistic rules and does not translate the spoken languages word by word. Hence, there is a need for systems to translate sign languages to spoken languages.
 
-%-------------------------------------------------------------------------
 \subsection{Sign Language Translation}
 
+Sign language translation is a very challenging task and has been an active field of
+research for the past two decades. Most of the research conducted to date has focused on sign language recognition (SLR), that is recognizing the sequence of sign glosses \footnote{sign glosses are spoken language words matching the meaning of signs}, ignoring the linguistic properties of the sign language and assuming that there is a one-to-one mapping to spoken words. Recent advances have tried to tackle sign language translation (SLT), that is the full mapping from signs to spoken words.
+\\
 explain Sign2Text, Gloss2Text, Sign2Gloss2Text, Sign2(Gloss+Text)
-
 explain dataset
-
-
 \subsection{Sign Language Transformers}
-
-Here we briefly present Sign Language Transformers \cite{neccam}. We adopt the same notations as in the paper. First, embeddings are extracted from each video frame using a 2D CNN
+Here we briefly present the Sign Language Transformers model introduced in \cite{neccam}. We adopt the same notations as in the paper. First, embeddings are extracted from each video frame using a 2D CNN
 $$f_{t}= \text{SpatialEmbedding} \left(I_{t}\right) \forall t\in[1, T]$$
 This sequence of embeddings is then passed through a Transformer encoder, producing a sequence of encoded spatial embeddings that are then mapped to glosses with a linear layer for sign language recognition. As the number of spatial embeddings may be different from the number of gloss tokens, the Connectionist Temporal Classification (CTC) loss is used. The output of the encoder (before the gloss prediction layer) is passed to the transformer decoder. The decoder also takes as input the target sentence, prepended with a Start Of Sequence (SOS) token, and is trained as in a classical autoregressive seq2seq model. Therefore, Sign Language Transformers learn to predict glosses and sentences jointly.
 
@@ -106,13 +104,6 @@ In order to extract 2D and 3D body keypoints, we applied a pre-trained version o
 	\label{fig:2d_3d}
 \end{figure}
 
-\begin{figure}[h]
-		\centering
-		\includegraphics[width=8.7cm]{fig/keypoints.pdf}
-	\caption{DOPE Results on  PHOENIX-2014T}
-	\label{fig:pie_charts}
-\end{figure}
-
 \section{Experiments}
 \subsection{Implementation}
 
@@ -135,7 +126,64 @@ That is, we compare the embeddings of a given video with the other embeddings of
 \end{itemize}
 
 We first visualize the embeddings of a the 2D CNN pre-trained on sign language data.
+\subsection{Influence of Body Keypoints}
+put results + show matrices\\
+\begin{table}[h]
+\centering
+\begin{tabular}{*5c}
+	\toprule
+	Input &  \multicolumn{4}{c}{DEV}\\
+	\midrule
+	{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
+	Neccam   &  45.54 & 32.60  & 25.30  & 20.69\\
+	+avg   &  46.61 & 33.17   & 25.21  & 20.09\\
+	+max   &  45.98  &  32.44   & 24.79  & 19.99\\
+	\bottomrule
+\end{tabular}
+\caption{Sign2Text with additional Pooling Embeddings}
+\end{table}
 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{*5c}
+		\toprule
+		Input &  \multicolumn{4}{c}{DEV}\\
+		\midrule
+		{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
+		Neccam   &  45.54 & 32.60  & 25.30  & 20.69\\
+		+hand\_2d   &  45.66 & 32.52   & 24.79  & 19.18\\
+		+face\_2d   &  46.06  &  32.44   & 24.63  & 19.61\\
+		+body\_2d   &  45.73 &  32.04   & 24.34  & 19.53\\	
+		\bottomrule
+	\end{tabular}
+	\caption{Sign2Text with additional 2D Keypoints}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{*5c}
+		\toprule
+		Input &  \multicolumn{4}{c}{DEV}\\
+		\midrule
+		{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
+		Neccam   &  45.54 & 32.60  & 25.30  & 20.69\\
+		+hand\_3d   &  46.19 & 32.49   & 24.24  & 18.92\\
+		+face\_3d   &  45.56  &  32.10 & 24.27  & 19.27\\
+		+body\_3d   &  44.96 &  31.96   & 24.32  & 19.46\\	
+		\bottomrule
+	\end{tabular}
+	\caption{Sign2Text with additional 3D Keypoints}
+\end{table}
+
+explain that poor results were due to DOPE performing poorly on PHEONIX datasets\\
+add comment for future work: use part experts?
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=8.7cm]{fig/keypoints.pdf}
+	\caption{DOPE Results on  PHOENIX-2014T}
+	\label{fig:pie_charts}
+\end{figure} 
 
 {\small
 \bibliographystyle{ieee_fullname}
