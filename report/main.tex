@@ -53,7 +53,7 @@ Clément \textsc{Grisi}\\
 
 
 \begin{abstract}
-	Sign Language Transformers \cite{neccam}, the current state-of-the-art in sign language translation, leverages a Transformer-based encoder-decoder architecture with intermediate gloss supervision to jointly learn continuous sign language recognition and translaton. We investigated two avenues for improving the results presented in \cite{neccam}. First, we slightly modified the Sign Language Transformers pipeline by replacing the 2D CNN with a 3D CNN, better suited for processing videos. Then, we trained the Transformer-based model with additional human keypoint inputs. Although our experiments weren't conclusive, we have laid the foundation for future work and strongly believe their is room for improvement. 
+	Sign Language Transformers \cite{neccam}, the current state-of-the-art in sign language translation, leverages a Transformer-based encoder-decoder architecture with intermediate gloss supervision to jointly learn continuous sign language recognition and translation. We investigated two avenues for improving the results presented in \cite{neccam}. First, we slightly modified the Sign Language Transformers pipeline by replacing the 2D CNN backbone with a 3D CNN, better suited for processing videos. We experiment with self-supervised techniques to train this new backbone. Then, we trained the Transformer-based model with additional human keypoint inputs. Although our experiments weren't conclusive, we have laid the foundation for future work and strongly believe there is room for improvement. 
 \end{abstract}
 
 \section{Introduction}
@@ -127,7 +127,37 @@ That is, we compare the embeddings of a given video with the other embeddings of
 	\item matrix $B$ to not have many values close to $1$ as two different videos probably don't translate to related sentences.
 \end{itemize}
 
-We first visualize the embeddings of a the 2D CNN pre-trained on sign language data.
+\begin{figure}[h]
+	\begin{subfigure}[t]{0.5\linewidth}
+		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_2d}
+		\includegraphics[height=1.8cm]{fig/matrices/b_2d}
+		\caption{Inception pre-trained on sign language recognition}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.5\linewidth}
+		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_kinetics}
+		\includegraphics[height=1.8cm]{fig/matrices/b_kinetics}
+		\caption{R(2+1)D pre-trained on Kinetics-400}
+	\end{subfigure}
+	\par\bigskip
+	\begin{subfigure}[t]{0.5\linewidth}
+		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_tarrow}
+		\includegraphics[height=1.8cm]{fig/matrices/b_tarrow}
+		\caption{R(2+1)D pre-trained on time arrow prediction}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.5\linewidth}
+		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_vcop}
+		\includegraphics[height=1.8cm]{fig/matrices/b_vcop}
+		\caption{R(2+1)D pre-trained on clip order prediction}
+	\end{subfigure}
+	\caption{2D \& 3D Keypoints on PHOENIX-2014T}
+	\label{fig:2d_3d}
+\end{figure}
+
+
 \subsection{Influence of Body Keypoints}
 
 We summarize hereunder the translation performances observed on PHOENIX-2014T dev dataset when feeding the network additionnal body keypoints inputs. Table \ref{tab:embeddings} shows the performances when concatenating the 2D CNN embeddings from \cite{neccam} with the pooling embeddings extracted from each video frame with DOPE.
