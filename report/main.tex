@@ -301,7 +301,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 No matter what combination of additional inputs we feed the network, we do not witness any significative improvement in translation performances. This is mainly due to DOPE performing relatively poorly on the PHOENIX-2014T dev dataset. Even though it manages to identify body keypoints in almost every single frames, it only rarely detects the signer's face and hands (Figure \ref{fig:pie_charts}). Hence, we're mostly adding noise to the baseline embeddings. 
 Instead of using a single model for whole-body pose estimation, one could try using indepedent hand, face and body experts to detect more precisely each part of the signer's expression. Multi-Channel Transformers \cite{multi-channel} were recently proposed to combine inputs from multiple such experts.
 
-\begin{figure}[t]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=8.7cm]{fig/keypoints.pdf}
 	\vspace{-1.4\baselineskip}
@@ -310,10 +310,7 @@ Instead of using a single model for whole-body pose estimation, one could try us
 \end{figure} 
 
 
-To further understand why DOPE-extracted body keypoints do not help improve the translation of our model, we plot the cosine similarities between the pooled embeddings of a given video with the pooled embeddings of the same video (matrix $A$) and with the pooled embeddings of another video (matrix $B$).
-
-
-These matrices corroborate our findings: DOPE doesn't perform well on PHOENIX-2014T. Indeed, the pooled embeddings are highly similar because the model solely identifies the signer's body, which is nearly the same regardless of the frame/video that we are analyzing.
+To further understand why DOPE-extracted body keypoints do not help improve the translation of our model, we plot the cosine similarities between the pooled embeddings of a given video with the pooled embeddings of the same video (matrix $A$) and with the pooled embeddings of another video (matrix $B$) (Figure \ref{fig:self_supervised_embeddings}). These matrices corroborate our findings: DOPE doesn't perform well on PHOENIX-2014T. Indeed, the pooled embeddings are highly similar because the model solely identifies the signer's body, which is nearly the same regardless of the video we are analyzing.
 \section{Conclusion}
 We explored two techniques for training a 3D feature extractor in a self-supervised way. While we did not obtain satisfying results, we still believe that self-supervised learning on larger datasets can be lead to improvements. Regarding the work done using humain body keypoints as additional inputs, we think that a more specialized pose estimation model is necessary in order to benefit sign language translation.
 
