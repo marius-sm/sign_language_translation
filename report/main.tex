@@ -115,22 +115,22 @@ To assess the quality of our embeddings, we visualize their cosine similarities.
 $$A_{tt'} = \frac{{f_t^1}^\intercal f_{t'}^1}{\lVert f_t^1 \rVert \lVert f_{t'}^1 \rVert}, \quad\forall t, t' \in\{1, ..., \tilde{T}^1\}$$
 $$B_{tu} = \frac{{f_t^1}^\intercal f_u^2}{\lVert f_t^1 \rVert \lVert f_u^2 \rVert}, \quad \forall t \in\{1, ..., \tilde{T}^1\}, u \in\{1, ..., \tilde{T}^2\}$$
 That is, we compare the embeddings of a given video with the other embeddings of the same video (matrix $A$) and with the embeddings of another video (matrix $B$). Intuitively, we want 
-\begin{itemize}
-	\item matrix $A$ to look like a diagonal matrix, where temporaly close frames have similar embeddings, but frames that are far appart have disimilar embeddings, so that there is enough information to recover the translation
-	\item matrix $B$ to not have many values close to $1$ as two different videos probably don't translate to related sentences.
-\end{itemize}
+(1) matrix $A$ to look like a diagonal matrix, where temporaly close frames have similar embeddings, but frames that are far appart have disimilar embeddings, so that there is enough information to recover the translation and (2) matrix $B$ to not have many values close to $1$ as two different videos probably don't translate to related sentences.
+
 
 \begin{figure}[t]
 	\begin{subfigure}[t]{0.5\linewidth}
 		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
 		\includegraphics[height=1.8cm]{fig/matrices/a_2d}
 		\includegraphics[height=1.8cm]{fig/matrices/b_2d}
+		\vspace{-0.1\baselineskip}
 		\caption{\centering Inception pre-trained on sign language recognition}
 	\end{subfigure}\hfill
 	\begin{subfigure}[t]{0.5\linewidth}
 		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
 		\includegraphics[height=1.8cm]{fig/matrices/a_kinetics}
 		\includegraphics[height=1.8cm]{fig/matrices/b_kinetics}
+		\vspace{-0.1\baselineskip}
 		\caption{\centering R(2+1)D pre-trained on Kinetics-400}
 	\end{subfigure}
 	\par\medskip
@@ -138,23 +138,76 @@ That is, we compare the embeddings of a given video with the other embeddings of
 		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
 		\includegraphics[height=1.8cm]{fig/matrices/a_tarrow}
 		\includegraphics[height=1.8cm]{fig/matrices/b_tarrow}
+		\vspace{-0.1\baselineskip}
 		\caption{\centering R(2+1)D pre-trained on time arrow prediction}
 	\end{subfigure}\hfill
 	\begin{subfigure}[t]{0.5\linewidth}
 		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
 		\includegraphics[height=1.8cm]{fig/matrices/a_vcop}
 		\includegraphics[height=1.8cm]{fig/matrices/b_vcop}
+		\vspace{-0.1\baselineskip}
 		\caption{\centering R(2+1)D pre-trained on clip order prediction}
 	\end{subfigure}
 	\par\medskip
+	\begin{subfigure}[t]{0.5\linewidth}
+		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_avg.png}
+		\includegraphics[height=1.8cm]{fig/matrices/b_avg.png}
+		\vspace{-0.1\baselineskip}
+		\caption{\centering Average pooling $1024$-dim embeddings}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.5\linewidth}
+		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_max.png}
+		\includegraphics[height=1.8cm]{fig/matrices/b_max.png}
+		\vspace{-0.1\baselineskip}
+		\caption{\centering Max pooling $1024$-dim embeddings}
+	\end{subfigure}
+	\par\medskip
+	\begin{subfigure}[t]{0.5\linewidth}
+		\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_amax.png}
+		\includegraphics[height=1.8cm]{fig/matrices/b_amax.png}
+		\vspace{-0.1\baselineskip}
+		\caption{\centering Argmax pooling $2048$-dim embeddings}
+	\end{subfigure}\hfill
 	\centering
+	\par\medskip
 	\includegraphics[width=0.48\textwidth]{fig/colorbar}
 	\caption{Visualization of cosine similarities between different embeddings. For each pair, the left figure is matrix A and the right one is matrix B.}
 	\label{fig:self_supervised_embeddings}
 \end{figure}
 
+%\begin{figure}[t]
+%	\begin{subfigure}[t]{0.5\linewidth}
+%		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+%		\includegraphics[height=1.8cm]{fig/matrices/a_avg.png}
+%		\includegraphics[height=1.8cm]{fig/matrices/b_avg.png}
+%		\caption{\centering Average pooling $1024$-dim embeddings}
+%	\end{subfigure}\hfill
+%	\begin{subfigure}[t]{0.5\linewidth}
+%		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+%		\includegraphics[height=1.8cm]{fig/matrices/a_max.png}
+%		\includegraphics[height=1.8cm]{fig/matrices/b_max.png}
+%		\caption{\centering Max pooling $1024$-dim embeddings}
+%	\end{subfigure}
+%	\par\medskip
+%	\centering
+%	\begin{subfigure}[t]{0.5\linewidth}
+%		\captionsetup{width=.9\linewidth, justification=raggedright}
+%		\includegraphics[height=1.8cm]{fig/matrices/a_amax.png}
+%		\includegraphics[height=1.8cm]{fig/matrices/b_amax.png}
+%		\caption{\centering Argmax pooling $2048$-dim embeddings}
+%	\end{subfigure}\hfill
+%	\par\medskip
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{fig/colorbar}
+%	\caption{Visualization of cosine similarities between different DOPE-extracted embeddings. In the same fashion as in Figure \ref*{fig:self_supervised_embeddings}, for each pair, the left figure is matrix A and the right one is matrix B.}
+%	\label{fig:DOPE_embeddings}
+%\end{figure}
+
 \subsection{Results on self-supervised features}
-The results are summarized in Table \ref{tab:self-sup}. Unfortunately, the performance of embeddings obtained from R(2+1)D pre-trained on either Kinetics-400 or on self-supervised tasks do not come close to the baseline embeddings \cite{hmm}. We are disappointed by the fact that self-supervised training on PHOENIX14T does not improve upon Kinetics-400 features. We also downsampled the baseline embeddings by taking only 1 in 8 frames to match the number of embeddings that are output by R(2+1)D. The performance was only slightly worse.
+The results are summarized in Table \ref{tab:self-sup}. Unfortunately, the performance of embeddings obtained from R(2+1)D pre-trained on either Kinetics-400 or on self-supervised tasks do not come close to the baseline embeddings \cite{hmm}. We are disappointed by the fact that self-supervised training on PHOENIX-2014T does not improve upon Kinetics-400 features. We also downsampled the baseline embeddings by taking only 1 in 8 frames to match the number of embeddings that are output by R(2+1)D. The performance was only slightly worse.
 
 \begin{table}[H]
 	\centering
@@ -172,6 +225,7 @@ The results are summarized in Table \ref{tab:self-sup}. Unfortunately, the perfo
 		S2T, clip order R(2+1)D  &  8.41 & - \\
 		\bottomrule
 	\end{tabular}
+	\vspace{-0.4\baselineskip}
 	\caption{BLEU-4 on PHOENIX-2014T dev when training a Sign Language Transformer on self-supervised features. Note that in \cite{neccam}, the optimal number of beams and length penalty are grid-searched whereas we always take number of beams = 7 and length penalty = 1. }
 	\label{tab:self-sup}
 \end{table}
@@ -195,6 +249,7 @@ We summarize hereunder the translation performances observed on PHOENIX-2014T de
 	+max+amax  &  44.32 & 31.50  & 24.09  & 19.27\\
 	\bottomrule
 \end{tabular}
+\vspace{-0.4\baselineskip}
 \caption{Sign2Text with additional Pooling Embeddings}
 \label{tab:embeddings}
 \end{table}
@@ -215,6 +270,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 		+fhb\_2d\footnotemark[4] &  \textbf{46.09} &  32.16   & 23.96  & 18.75\\	
 		\bottomrule
 	\end{tabular}
+	\vspace{-0.4\baselineskip}
 	\caption{Sign2Text with additional 2D Keypoints}
 	\label{tab:2d_keypoints}
 \end{table}
@@ -235,6 +291,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 		+fhb\_3d\footnotemark[4]  &  46.09 &  32.34   & 24.00  & 18.85\\	
 		\bottomrule
 	\end{tabular}
+	\vspace{-0.4\baselineskip}
 	\caption{Sign2Text with additional 3D Keypoints}
 	\label{tab:3d_keypoints}
 \end{table}
@@ -247,37 +304,11 @@ Instead of using a single model for whole-body pose estimation, one could try us
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=8.7cm]{fig/keypoints.pdf}
+	\vspace{-1.4\baselineskip}
 	\caption{DOPE Results on  PHOENIX-2014T}
 	\label{fig:pie_charts}
 \end{figure} 
 
-\begin{figure}[t]
-	\begin{subfigure}[t]{0.5\linewidth}
-		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
-		\includegraphics[height=1.8cm]{fig/matrices/a_avg.png}
-		\includegraphics[height=1.8cm]{fig/matrices/b_avg.png}
-		\caption{\centering Average pooling $1024$-dim embeddings}
-	\end{subfigure}\hfill
-	\begin{subfigure}[t]{0.5\linewidth}
-		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
-		\includegraphics[height=1.8cm]{fig/matrices/a_max.png}
-		\includegraphics[height=1.8cm]{fig/matrices/b_max.png}
-		\caption{\centering Max pooling $1024$-dim embeddings}
-	\end{subfigure}
-	\par\medskip
-	\centering
-	\begin{subfigure}[t]{0.5\linewidth}
-		\captionsetup{width=.9\linewidth, justification=raggedright}
-		\includegraphics[height=1.8cm]{fig/matrices/a_amax.png}
-		\includegraphics[height=1.8cm]{fig/matrices/b_amax.png}
-		\caption{\centering Argmax pooling $2048$-dim embeddings}
-	\end{subfigure}\hfill
-	\par\medskip
-	\centering
-	\includegraphics[width=0.48\textwidth]{fig/colorbar}
-	\caption{Visualization of cosine similarities between different DOPE-extracted embeddings. In the same fashion as in Figure \ref*{fig:self_supervised_embeddings}, for each pair, the left figure is matrix A and the right one is matrix B.}
-	\label{fig:DOPE_embeddings}
-\end{figure}
 
 To further understand why DOPE-extracted body keypoints do not help improve the translation of our model, we plot the cosine similarities between the pooled embeddings of a given video with the pooled embeddings of the same video (matrix $A$) and with the pooled embeddings of another video (matrix $B$).
 
