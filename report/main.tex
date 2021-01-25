@@ -59,16 +59,11 @@ Clément \textsc{Grisi}\\
 \section{Introduction}
 According to the World Health Organization, over 5\% of the world’s population -- around 466 million people – are deaf or suffer from disabling hearing loss \cite{WHO}. For many of these individuals, sign language is their primary mean of communication. Despite widespread misconceptions, sign language has its own set of linguistic rules and does not translate the spoken languages word by word. Hence, there is a need for systems to translate sign languages to spoken languages.
 
-\subsection{Sign Language Translation}
-
-Sign language translation is a very challenging task and has been an active field of
+\paragraph{Sign Language Translation}Sign language translation is a very challenging task and has been an active field of
 research for the past two decades. Most of the research conducted to date has focused on sign language recognition (SLR), that is recognizing the sequence of sign glosses \footnote{sign glosses are spoken language words matching the meaning of signs}, ignoring the linguistic properties of the sign language and assuming that there is a one-to-one mapping to spoken words. Recent advances have tried to tackle sign language translation (SLT), that is the full mapping from signs to spoken words.
-Given the complexity of translating sign language video to spoken language sentences in an end-to-end manner (Sign2Text), people have introduced intermediate subtasks to bridge the gap between sign language recognition -- recognizing glosses -- and full translation. A combination of these subtasks, the Sign2Gloss2Text approach, used to be state-of-the-art. It consists in training a Sign2Gloss model to extract gloss sequences from sign language videos, which are then used to solve the translation task as a text-to-text problem by separately training a Gloss2Text model. However, the mid-level gloss representation introduces an information bottleneck. Joint learning of continuous sign language recognition and translation (Sign2(Gloss+Text)), was designed to overcome this bottleneck. We evaluate our approach on the recently released PHOENIX14T dataset \cite{phoenix}, which contains parallel sign language videos, gloss annotations and their translations.
-\subsection{Sign Language Transformers}
-Here we briefly present the Sign Language Transformers model introduced in \cite{neccam}. We adopt the same notations as in the paper. First, embeddings are extracted from each video frame using a 2D CNN
-$$f_{t}= \text{SpatialEmbedding} \left(I_{t}\right) \forall t\in[1, T]$$
-This sequence of embeddings is then passed through a Transformer encoder, producing a sequence of encoded spatial embeddings that are then mapped to glosses with a linear layer for sign language recognition. As the number of spatial embeddings may be different from the number of gloss tokens, the Connectionist Temporal Classification (CTC) loss is used. The output of the encoder (before the gloss prediction layer) is passed to the transformer decoder. The decoder also takes as input the target sentence, prepended with a Start Of Sequence (SOS) token, and is trained as in a classical autoregressive seq2seq model. Therefore, Sign Language Transformers learn to predict glosses and sentences jointly.
-
+Given the complexity of translating sign language video to spoken language sentences in an end-to-end manner (Sign2Text), people have introduced intermediate subtasks to bridge the gap between sign language recognition -- recognizing glosses -- and full translation. A combination of these subtasks, the Sign2Gloss2Text approach, used to be state-of-the-art. It consists in training a Sign2Gloss model to extract gloss sequences from sign language videos, which are then used to solve the translation task as a text-to-text problem by separately training a Gloss2Text model. However, the mid-level gloss representation introduces an information bottleneck. Joint learning of continuous sign language recognition and translation (Sign2(Gloss+Text)), was designed to overcome this bottleneck. We evaluate our approach on the recently released PHOENIX14T dataset \cite{phoenix}, which contains sign language videos with gloss annotations and text translations.
+\paragraph{Sign Language Transformers}
+Introduced in \cite{neccam}, this architecture combines gloss prediction and text translation in a joint model. First, an embeddings is obtained for each frame with a pre-trained CNN. The encoder-decoder transformer is then trained (1) to predict the glosses from the outputs of the encoder with a CTC loss and (2) to predict the translation autoregressively.
 
 %-------------------------------------------------------------------------
 \section{Video Representations}
@@ -80,11 +75,10 @@ It is worth noting that this 2D CNN feature extractor is not trained jointly wit
 We investigate replacing the 2D CNN by a 3D CNN. Our goal is to pre-train this 3D CNN to extract good representations of sign language videos for the Sign2Text task. Training it end-to-end with the Sign Language Transformer is difficult because this requires a lot of GPU memory. Indeed, the input videos can have many frames (up to 475 in the PHOENIX-2014T \cite{phoenix} dataset) and cannot easily be split into multiple parts since they are paired with a sentence. In our experiments, on a single GPU, even a batch size of 1 did not allow us to train with videos of more than 384 frames. Although one could try to reduce the framerate, we prefer to experiment with techniques that do not require textual targets. We experiment with several self-supervised pre-training tasks.
 \subsection{Self-Supervised Learning of Video Representations}
 Recently, there has been a growing interest in self-supervised learning because it allows to leverage large amounts of unlabeled data. Multiple approaches have been developped for self-supervised learning from videos. We explore two of them: predicting whether a video is played forward or backward \cite{arrow} and predicting the order of shuffled clips \cite{vcop}. Other approaches include learning from temporaly modified videos \cite{playback-rate, pace, temp-trans}, learning to predict the future \cite{pred-coding} and contrastive learning \cite{contrast, bert-video}.
-\subsubsection{Learning from the Arrow of Time}
+\paragraph{Learning from the Arrow of Time}
 It has been shown \cite{arrow} that learning to predict whether a video clip is played forward or backward can be useful to learn good representations of videos. Our intuition tells us that this task may be particularly well adapted for learning high-level representations of sign language videos since it is very hard to solve for humans that do not know sign language.
-
-\subsubsection{Predicting the Order of Shuffled Clips}
-The goal of this task is to predict the order of different clips in a video. More specifically, given some video, several (in general, 3) non-overlapping clips are extracted. A random permutation is chosen (in the case of 3 clips, there are 6 possible permutations). Each clip is passed through a 3D CNN and average-pooled to a feature vector. The feature vectors of all clips are concatenated and passed through a 2-layer MLP-like neural network, which predicts the permutation of the clips. Intuitively, only a high-level understanding of the videos allows to predict the order of non-overlapping clips.
+\paragraph{Predicting the Order of Shuffled Clips}
+The goal of this task is to predict the order of different clips in a video. First, 3 non-overlapping clips are extracted from a video. From 6 possible permutation, one is chosen randomly. Each clip is passed through a 3D CNN and average-pooled to a feature vector. The feature vectors of all clips are concatenated and passed through a 2-layer MLP-like neural network, which predicts the permutation of the clips. Intuitively, only a high-level understanding of the videos allows to predict the order of non-overlapping clips.
 \subsection{Human Keypoint Estimation}
 \subsubsection{Modeling the Body Pose}
 Sign language being visual, signers rely on multiple complementary channels to convey information. These can be grouped into two main categories: manual and non-manual features. Manual features mainly correspond to the hand shape and its motion through time. Although these are often considered as the governing part of the sign morphology, they alone do not enclose the full context of the conveyed information. To give clarity, add precisions and nuance their words, signers often use non-manual features, such as facial expressions, mouth gesture and body pose. This motivates our work to investigate whether explicitly modelling the body pose (hands, face, upper body) could benefit neural sign language translation.
@@ -94,11 +88,11 @@ In order to extract 2D and 3D body keypoints, we apply a pre-trained version of 
 \begin{figure}[h]
 	\begin{subfigure}[h]{0.5\linewidth}
 		\centering
-			\includegraphics[width=4cm]{fig/toy_DOPE_v1_0_0_2d.png}
+			\includegraphics[height=4cm]{fig/toy_DOPE_v1_0_0_2d.png}
 	\end{subfigure}\hfill
 	\begin{subfigure}[]{0.5\linewidth}
 		\centering
-		\includegraphics[width=4cm]{fig/toy_DOPE_v1_0_0_3d.png}
+		\includegraphics[height=4cm]{fig/toy_DOPE_v1_0_0_3d.png}
 	\end{subfigure}
 	\caption{2D \& 3D Keypoints on PHOENIX-2014T}
 	\label{fig:2d_3d}
@@ -158,12 +152,36 @@ That is, we compare the embeddings of a given video with the other embeddings of
 	\label{fig:self_supervised_embeddings}
 \end{figure}
 
+\subsection{Results on self-supervised features}
+The results are summarized in Table \ref{tab:self-sup}. Unfortunately, the performance of embeddings obtained from R(2+1)D pre-trained on either Kinetics-400 or on self-supervised tasks do not come close to embeddings from an Inception network pre-trained on sign laguage recognition \cite{hmm}. We are disappointed by the fact that self-supervised training on PHOENIX14T does not improve upon Kinetics-400 features. We also downsampled the Inception embeddings by taking only 1 in 8 frames to match the number of embeddings that are output by R(2+1)D. The performance was only slightly worse.
+
+\begin{table}[H]
+	\centering
+	\def\arraystretch{0.9}
+	\setlength{\tabcolsep}{0.2em}
+	\begin{tabular}{l c c}
+		\toprule
+		Input   & Our implem.   & Results from \cite{neccam} \\
+		\midrule
+		Gloss2Text   &  24.49 & 25.35 \\
+		S2T, Inception \cite{hmm}   &  19.49 & 20.69  \\
+		S2T, Inception \cite{hmm}, 1 in 8   &  17.08  &  -  \\
+		S2T, kinetics R(2+1)D &  8.86 &  -  \\
+		S2T, time arrow R(2+1)D  &  8.58 & - \\
+		S2T, clip order R(2+1)D  &  8.41 & - \\
+		\bottomrule
+	\end{tabular}
+	\caption{Results when pre-training a Sign Language Transformer on self-supervised features. Note that in \cite{neccam}, the optimal number of beams and length penalty are grid-searched whereas we always take number of beams = 7 and length penalty = 1. }
+	\label{tab:self-sup}
+\end{table}
+
 
 \subsection{Influence of Body Keypoints}
 
 We summarize hereunder the translation performances observed on PHOENIX-2014T dev dataset when feeding the network additionnal body keypoints inputs. Table \ref{tab:embeddings} shows the performances when concatenating the 2D CNN embeddings from \cite{neccam} with the pooling embeddings extracted from each video frame with DOPE.
 \begin{table}[H]
 \centering
+\def\arraystretch{0.9}
 \begin{tabular}{*5c}
 	\toprule
 	Input &  \multicolumn{4}{c}{DEV}\\
@@ -182,6 +200,7 @@ We summarize hereunder the translation performances observed on PHOENIX-2014T de
 Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the performances of the five best experiments obtained when concatenating the same 2D CNN embeddings with the 2D (resp. 3D) body keypioints extracted using DOPE. While the 2D keypoints had to be normalized by the mean and standard deviation of the corresponding body part, the 3D keypoints were already between $0$ and $1$ hence didn't need to be normalized. 
 \begin{table}[h]
 	\centering
+	\def\arraystretch{0.9}
 	\begin{tabular}{*5c}
 		\toprule
 		Input &  \multicolumn{4}{c}{DEV}\\
@@ -201,6 +220,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 
 \begin{table}[h]
 	\centering
+	\def\arraystretch{0.9}
 	\begin{tabular}{*5c}
 		\toprule
 		Input &  \multicolumn{4}{c}{DEV}\\
