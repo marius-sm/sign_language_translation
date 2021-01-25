@@ -33,7 +33,9 @@
 \begin{document}
 
 %%%%%%%%% TITLE
-\title{Sign Language Translation from Video to Text}
+\title{Sign Language Translation from Video to Text\\
+	\vspace{2mm}
+\small{\normalfont January $24^{\text{th}}$, 2021}}
 
 \author{Marius \textsc{Schmidt-Mengin}\\
 	École des Ponts ParisTech\\
@@ -53,8 +55,7 @@ Clément \textsc{Grisi}\\
 
 
 \begin{abstract}
-	Sign Language Transformers \cite{neccam} leverage a Transformer-based encoder-decoder architecture with intermediate gloss supervision to jointly learn continuous sign language recognition and translation. We investigate two avenues for improving the results presented in \cite{neccam}. First, we slightly modify the Sign Language Transformers pipeline by replacing the 2D CNN backbone with a 3D CNN, better suited for processing videos. We experiment with self-supervised techniques to train this new backbone. Then, we train the Transformer-based model with additional human keypoint inputs. Although our experiments weren't conclusive, we still believe that the ideas we explored could lead to improvements in sign language translation.
-	
+	Sign Language Transformers \cite{neccam} leverage a Transformer-based encoder-decoder architecture with intermediate gloss supervision to jointly learn continuous sign language recognition and translation. We investigate two avenues for improving the results presented in \cite{neccam}. First, we slightly modify the Sign Language Transformers pipeline by replacing the 2D CNN backbone with a 3D CNN, better suited for processing videos. We experiment with self-supervised techniques to train this new backbone. Then, we train the Transformer-based model with additional human keypoint inputs. Although our experiments weren't conclusive, we still believe that the ideas we explored could lead to improvements in sign language translation. Our code is available at \url{https://github.com/marius-sm/sign_language_translation}.
 \end{abstract}
 
 \section{Introduction}
