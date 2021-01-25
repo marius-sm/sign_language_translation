@@ -207,7 +207,7 @@ That is, we compare the embeddings of a given video with the other embeddings of
 %\end{figure}
 
 \subsection{Results on self-supervised features}
-The results are summarized in Table \ref{tab:self-sup}. Unfortunately, the performance of embeddings obtained from R(2+1)D pre-trained on either Kinetics-400 or on self-supervised tasks do not come close to the baseline embeddings \cite{hmm}. We are disappointed by the fact that self-supervised training on PHOENIX-2014T does not improve upon Kinetics-400 features. We also downsampled the baseline embeddings by taking only 1 in 8 frames to match the number of embeddings that are output by R(2+1)D. The performance was only slightly worse.
+The results are summarized in Table \ref{tab:self-sup}. Unfortunately, the performance of embeddings obtained from R(2+1)D pre-trained on either Kinetics-400 or on self-supervised tasks does not come close to the baseline embeddings \cite{hmm}. We are disappointed by the fact that self-supervised training on PHOENIX-2014T does not improve upon Kinetics-400 features. We also downsampled the baseline embeddings by taking only 1 in 8 frames to match the number of embeddings that are output by R(2+1)D. The performance was only slightly worse.
 
 \begin{table}[H]
 	\centering
@@ -298,7 +298,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 \footnotetext[3]{face+hand keypoints} 
 \footnotetext[4]{face+hand+body keypoints}
 
-No matter what combination of additional inputs we feed the network, we do not witness any significative improvement in translation performances. This is mainly due to DOPE performing relatively poorly on the PHOENIX-2014T dev dataset. Even though it manages to identify body keypoints in almost every single frames, it only rarely detects the signer's face and hands (Figure \ref{fig:pie_charts}). Hence, we're mostly adding noise to the baseline embeddings. 
+No matter what combination of additional inputs we feed the network, we do not witness any significative improvement in translation performances. This is mainly due to DOPE performing relatively poorly on the PHOENIX-2014T dev dataset. Even though it manages to identify body keypoints in almost every single frames, it only rarely detects the signer's face and hands (Figure \ref{fig:pie_charts}). Hence, we are mostly adding noise to the baseline embeddings. 
 Instead of using a single model for whole-body pose estimation, one could try using indepedent hand, face and body experts to detect more precisely each part of the signer's expression. Multi-Channel Transformers \cite{multi-channel} were recently proposed to combine inputs from multiple such experts.
 
 \begin{figure}[H]
