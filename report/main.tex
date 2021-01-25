@@ -53,7 +53,7 @@ Clément \textsc{Grisi}\\
 
 
 \begin{abstract}
-	Sign Language Transformers \cite{neccam}, the current state-of-the-art in sign language translation, leverages a Transformer-based encoder-decoder architecture with intermediate gloss supervision to jointly learn continuous sign language recognition and translation. We investigate two avenues for improving the results presented in \cite{neccam}. First, we slightly modify the Sign Language Transformers pipeline by replacing the 2D CNN backbone with a 3D CNN, better suited for processing videos. We experiment with self-supervised techniques to train this new backbone. Then, we train the Transformer-based model with additional human keypoint inputs. Although our experiments weren't conclusive, we still believe that the ideas we explored could lead to improvements in sign language translation.
+	Sign Language Transformers \cite{neccam} leverage a Transformer-based encoder-decoder architecture with intermediate gloss supervision to jointly learn continuous sign language recognition and translation. We investigate two avenues for improving the results presented in \cite{neccam}. First, we slightly modify the Sign Language Transformers pipeline by replacing the 2D CNN backbone with a 3D CNN, better suited for processing videos. We experiment with self-supervised techniques to train this new backbone. Then, we train the Transformer-based model with additional human keypoint inputs. Although our experiments weren't conclusive, we still believe that the ideas we explored could lead to improvements in sign language translation.
 	
 \end{abstract}
 
@@ -102,7 +102,7 @@ In order to extract 2D and 3D body keypoints, we apply a pre-trained version of 
 \section{Experiments}
 \subsection{Implementation}
 
-To have more flexibility, we re-implement\footnote{\url{https://github.com/marius-sm/sign_language_translation}} Sign Language Transformers \cite{neccam} using Pytorch and HuggingFace transformers \cite{huggingface}. In all our experiments, we use a R(2+1)D \cite{r2plus1} pre-trained on the Kinetics-400 \cite{kinetics} dataset from the Torchvision library as 3D feature extractor. The last convolutional layer produces 512 channels. Whenever necessary, we average-pool those features to produce embeddings.
+To have more flexibility, we re-implement\footnote{\url{https://github.com/marius-sm/sign_language_translation}} Sign Language Transformers \cite{neccam} using Pytorch and HuggingFace transformers \cite{huggingface}. In all our experiments, we use a R(2+1)D \cite{r2plus1} pre-trained on the Kinetics-400 \cite{kinetics} dataset from the Torchvision library as 3D feature extractor. The last convolutional layer produces 512 channels. Whenever necessary, we average-pool those features to produce embeddings. To save training time and reduce GPU memory usage, we downsample the videos to a resolution of $130\times105$ pixels.
 
 To learn the arrow of time, we use clips of 8 frames and train with a batch size of 32. For clip order prediction, we extract 8 clips from each video with intervals of 8 frames and train with a batch size of 8. We optimize both networks with Adam and a low learning rate of $10^{-5}$ to avoid destroying the Kinetics-400 features.
 
