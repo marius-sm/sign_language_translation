@@ -106,7 +106,7 @@ To have more flexibility, we re-implement\footnote{\url{https://github.com/mariu
 
 To learn the arrow of time, we use clips of 8 frames and train with a batch size of 32. For clip order prediction, we extract 8 clips from each video with intervals of 8 frames and train with a batch size of 8. We optimize both networks with Adam and a low learning rate of $10^{-5}$ to avoid modifying the Kinetics-400 features too much.
 
-Once trained, we use these networks to extract the embeddings from all videos. As the videos have significantly more than 8 frames,  extracting the embeddings of a video in a single pass results in a strong train/test discrepancy. To adress this issue, we instead subdivide each video in chunks of 8 frames and extract the embedding of each chunk independently.
+Once trained, we use these networks to extract the embeddings from all videos. As most videos have significantly more than 8 frames,  extracting the embeddings of a video in a single pass results in a strong train/test discrepancy. To adress this issue, we instead subdivide each video in chunks of 8 frames and extract the embedding of each chunk independently.
 \subsection{Qualitative Assessments of Embeddings}
 After pooling the features along spatial dimensions, we obtain a sequence of spatial embeddings
 $$f_t, t\in[1, ..., \tilde{T}]$$
@@ -115,7 +115,7 @@ To assess the quality of our embeddings, we visualize their cosine similarities.
 $$A_{tt'} = \frac{{f_t^1}^\intercal f_{t'}^1}{\lVert f_t^1 \rVert \lVert f_{t'}^1 \rVert}, \quad\forall t, t' \in\{1, ..., \tilde{T}^1\}$$
 $$B_{tu} = \frac{{f_t^1}^\intercal f_u^2}{\lVert f_t^1 \rVert \lVert f_u^2 \rVert}, \quad \forall t \in\{1, ..., \tilde{T}^1\}, u \in\{1, ..., \tilde{T}^2\}$$
 That is, we compare the embeddings of a given video with the other embeddings of the same video (matrix $A$) and with the embeddings of another video (matrix $B$). Intuitively, we want 
-(1) matrix $A$ to look like a diagonal matrix, where temporaly close frames have similar embeddings, but frames that are far appart have disimilar embeddings, so that there is enough information to recover the translation and (2) matrix $B$ to not have many values close to $1$ as two different videos probably don't translate to related sentences. These matrices are shown on Figure \ref{fig:self_supervised_embeddings}. We can see that with the baseline embeddings, specific patterns emerge. These patterns are also slightly visible for the time arrow task. On the other hand, the embeddings produced the Kinetics-400 and order prediction features hint to lower discriminative power.
+(1) matrix $A$ to look like a diagonal matrix, where temporaly close frames have similar embeddings, but frames that are far appart have disimilar embeddings, so that there is enough information to recover the translation and (2) matrix $B$ to not have many values close to $1$ as two different videos probably don't translate to related sentences. These matrices are shown on Figure \ref{fig:self_supervised_embeddings}. We can see that with the \textit{baseline} embeddings, specific patterns emerge. These patterns are also slightly visible for the time arrow task. On the other hand, the embeddings produced the Kinetics-400 and order prediction features hint to lower discriminative power.
 
 
 \begin{figure}[t]
