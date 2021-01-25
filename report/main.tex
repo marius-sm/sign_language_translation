@@ -63,9 +63,7 @@ According to the World Health Organization, over 5\% of the world’s population
 
 Sign language translation is a very challenging task and has been an active field of
 research for the past two decades. Most of the research conducted to date has focused on sign language recognition (SLR), that is recognizing the sequence of sign glosses \footnote{sign glosses are spoken language words matching the meaning of signs}, ignoring the linguistic properties of the sign language and assuming that there is a one-to-one mapping to spoken words. Recent advances have tried to tackle sign language translation (SLT), that is the full mapping from signs to spoken words.
-\\
-explain Sign2Text, Gloss2Text, Sign2Gloss2Text, Sign2(Gloss+Text)
-explain dataset
+Given the complexity of translating sign language video to spoken language sentences in an end-to-end manner (Sign2Text), people have introduced intermediate subtasks to bridge the gap between sign language recognition -- recognizing glosses -- and full translation. A combination of these subtasks, the Sign2Gloss2Text approach, used to be state-of-the-art. It consists in training a Sign2Gloss model to extract gloss sequences from sign language videos, which are then used to solve the translation task as a text-to-text problem by separately training a Gloss2Text model. However, the mid-level gloss representation introduces an information bottleneck. Joint learning of continuous sign language recognition and translation (Sign2(Gloss+Text)), was designed to overcome this bottleneck. We evaluate our approach on the recently released PHOENIX14T dataset \cite{phoenix}, which contains parallel sign language videos, gloss annotations and their translations.
 \subsection{Sign Language Transformers}
 Here we briefly present the Sign Language Transformers model introduced in \cite{neccam}. We adopt the same notations as in the paper. First, embeddings are extracted from each video frame using a 2D CNN
 $$f_{t}= \text{SpatialEmbedding} \left(I_{t}\right) \forall t\in[1, T]$$
@@ -89,9 +87,9 @@ It has been shown \cite{arrow} that learning to predict whether a video clip is 
 The goal of this task is to predict the order of different clips in a video. More specifically, given some video, several (in general, 3) non-overlapping clips are extracted. A random permutation is chosen (in the case of 3 clips, there are 6 possible permutations). Each clip is passed through a 3D CNN and average-pooled to a feature vector. The feature vectors of all clips are concatenated and passed through a 2-layer MLP-like neural network, which predicts the permutation of the clips. Intuitively, only a high-level understanding of the videos allows to predict the order of non-overlapping clips.
 \subsection{Human Keypoint Estimation}
 \subsubsection{Modeling the Body Pose}
-Sign language being visual, signers rely on multiple complementary channels to convey information. These can be grouped into two main categories: manual and non-manual features. Manual features mainly correspond to the hand shape and its motion through time. Although these are often considered as the governing part of the sign morphology, they alone do not enclose the full context of the conveyed information. To give clarity, add precisions and nuance their words, signers use non-manual features, such as facial expressions, mouth gesture and body pose. This motivates our work to investigate whether explicitly modelling the body pose (hands, face, upper body) could benefit neural sign language translation.
+Sign language being visual, signers rely on multiple complementary channels to convey information. These can be grouped into two main categories: manual and non-manual features. Manual features mainly correspond to the hand shape and its motion through time. Although these are often considered as the governing part of the sign morphology, they alone do not enclose the full context of the conveyed information. To give clarity, add precisions and nuance their words, signers often use non-manual features, such as facial expressions, mouth gesture and body pose. This motivates our work to investigate whether explicitly modelling the body pose (hands, face, upper body) could benefit neural sign language translation.
 \subsubsection{Body Keypoints as Additional Inputs}
-In order to extract 2D and 3D body keypoints, we apply a pre-trained version of DOPE \cite{dope} to each frame in the PHOENIX-2014T dataset (Figure \ref{fig:2d_3d}). We slighltly modify the code provided by the authors by adding average and max-pooling layers on top of the ResNet50 backbone. We also experiment with argmax pooling, where we retain the $x$ and $y$ indices of the maximum of each feature map. In total, we have access to three pooled embeddings as well as 2D and 3D whole-body keypoints (face, hands, body) for each frame of the PHOENIX-2014T dataset. We normalize the keypoints by substracting the mean and dividing by the standard deviation of the corresponding body part and use them as additional input to the Sign Language Transformer, together with the pooled embeddings.
+In order to extract 2D and 3D body keypoints, we apply a pre-trained version of DOPE \cite{dope} to each frame in the PHOENIX-2014T dataset (Figure \ref{fig:2d_3d}). We slighltly modify the code provided by the authors by adding average and max-pooling layers on top of the ResNet50 backbone. We also experiment with argmax pooling, where we retain the $x$ and $y$ indices of the maximum of each feature map. In total, we have access to three pooled embeddings ($1024$-dim avg- and max-pooled embeddings, $2048$-dim argmax-pooled embeddings) as well as 2D and 3D whole-body keypoints (face: $84$ points, hands: $21$ points, body: $13$ points) for each frame in the PHOENIX-2014T dataset. We normalize the 2D keypoints by substracting the mean and dividing by the standard deviation of the corresponding body part. In order to assess whether or not these pose estimation features benefit sign language translation, we feed them as additional inputs to the Sign Language Transformer by simply concatenating them with the provided 2D CNN extracted embeddings, later refered as \textit{neccam} embeddings.
 
 \begin{figure}[h]
 	\begin{subfigure}[h]{0.5\linewidth}
@@ -132,32 +130,32 @@ That is, we compare the embeddings of a given video with the other embeddings of
 		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
 		\includegraphics[height=1.8cm]{fig/matrices/a_2d}
 		\includegraphics[height=1.8cm]{fig/matrices/b_2d}
-		\caption{Inception pre-trained on sign language recognition}
+		\caption{\centering Inception pre-trained on sign language recognition}
 	\end{subfigure}\hfill
 	\begin{subfigure}[t]{0.5\linewidth}
 		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
 		\includegraphics[height=1.8cm]{fig/matrices/a_kinetics}
 		\includegraphics[height=1.8cm]{fig/matrices/b_kinetics}
-		\caption{R(2+1)D pre-trained on Kinetics-400}
+		\caption{\centering R(2+1)D pre-trained on Kinetics-400}
 	\end{subfigure}
 	\par\medskip
 	\begin{subfigure}[t]{0.5\linewidth}
 		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
 		\includegraphics[height=1.8cm]{fig/matrices/a_tarrow}
 		\includegraphics[height=1.8cm]{fig/matrices/b_tarrow}
-		\caption{R(2+1)D pre-trained on time arrow prediction}
+		\caption{\centering R(2+1)D pre-trained on time arrow prediction}
 	\end{subfigure}\hfill
 	\begin{subfigure}[t]{0.5\linewidth}
 		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
 		\includegraphics[height=1.8cm]{fig/matrices/a_vcop}
 		\includegraphics[height=1.8cm]{fig/matrices/b_vcop}
-		\caption{R(2+1)D pre-trained on clip order prediction}
+		\caption{\centering R(2+1)D pre-trained on clip order prediction}
 	\end{subfigure}
 	\par\medskip
 	\centering
 	\includegraphics[width=0.48\textwidth]{fig/colorbar}
 	\caption{Visualization of cosine similarities between different embeddings. For each pair, the left figure is matrix A and the right one is matrix B.}
-	\label{fig:2d_3d}
+	\label{fig:self_supervised_embeddings}
 \end{figure}
 
 
@@ -171,7 +169,7 @@ We summarize hereunder the translation performances observed on PHOENIX-2014T de
 	Input &  \multicolumn{4}{c}{DEV}\\
 	\midrule
 	{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
-	Neccam   &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
+	neccam   &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
 	+avg   &  46.61 & 33.17   & 25.21  & 20.09\\
 	+max   &  45.98  &  32.44   & 24.79  & 19.99\\
 	+amax  &  \textbf{47.31} &  \textbf{33.34}   & 25.07  & 19.81\\
@@ -189,7 +187,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 		Input &  \multicolumn{4}{c}{DEV}\\
 		\midrule
 		{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
-		Neccam   &  45.54 & \textbf{32.60}  & \textbf{25.30}  & \textbf{20.69}\\
+		neccam   &  45.54 & \textbf{32.60}  & \textbf{25.30}  & \textbf{20.69}\\
 		+hand\_2d   &  45.66 & 32.52   & 24.79  & 19.18\\
 		+face\_2d   &  46.06  &  32.44   & 24.63  & 19.61\\
 		+body\_2d   &  45.73 &  32.04   & 24.34  & 19.53\\	
@@ -208,7 +206,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 		Input &  \multicolumn{4}{c}{DEV}\\
 		\midrule
 		{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
-		Neccam   &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
+		neccam   &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
 		+hand\_3d   &  46.19 & 32.49   & 24.24  & 18.92\\
 		+face\_3d   &  45.56  &  32.10 & 24.27  & 19.27\\
 		+body\_3d   &  44.96 &  31.96   & 24.32  & 19.46\\	
@@ -231,6 +229,39 @@ No matter what combination of additional inputs we fed the network, we didn't wi
 	\label{fig:pie_charts}
 \end{figure} 
 
+To further understand why DOPE-extracted body keypoints do not help improve the translation of our model, we plot the cosine similarities between the pooled embeddings of a given video with the pooled embeddings of the same video (matrix $A$) and with the pooled embeddings of another video (matrix $B$).
+
+\begin{figure}[h]
+	\begin{subfigure}[t]{0.5\linewidth}
+		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_avg.png}
+		\includegraphics[height=1.8cm]{fig/matrices/b_avg.png}
+		\caption{\centering Average pooling $1024$-dim embeddings}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.5\linewidth}
+		\centering\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_max.png}
+		\includegraphics[height=1.8cm]{fig/matrices/b_max.png}
+		\caption{\centering Max pooling $1024$-dim embeddings}
+	\end{subfigure}
+	\par\medskip
+	\centering
+	\begin{subfigure}[t]{0.5\linewidth}
+		\captionsetup{width=.9\linewidth, justification=raggedright}
+		\includegraphics[height=1.8cm]{fig/matrices/a_amax.png}
+		\includegraphics[height=1.8cm]{fig/matrices/b_amax.png}
+		\caption{\centering Argmax pooling $2048$-dim embeddings}
+	\end{subfigure}\hfill
+	\par\medskip
+	\centering
+	\includegraphics[width=0.48\textwidth]{fig/colorbar}
+	\caption{Visualization of cosine similarities between different DOPE-extracted embeddings. In the same fashion as in Figure \ref*{fig:self_supervised_embeddings}, for each pair, the left figure is matrix A and the right one is matrix B.}
+	\label{fig:DOPE_embeddings}
+\end{figure}
+
+These matrices corroborate our findings: DOPE doesn't perform well on PHOENIX-2014T. Indeed, t pooled embeddings are highly similar because the model solely identifies the signer's body, which is pretty much the same regardless of the frame/video we're analyzing.
+\section{Conclusion}
+add conclusion
 {\small
 \bibliographystyle{ieee_fullname}
 \bibliography{egbib}
