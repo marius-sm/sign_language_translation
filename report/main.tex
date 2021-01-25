@@ -83,7 +83,7 @@ The goal of this task is to predict the order of different clips in a video. Fir
 \subsubsection{Modeling the Body Pose}
 Sign language being visual, signers rely on multiple complementary channels to convey information. These can be grouped into two main categories: manual and non-manual features. Manual features mainly correspond to the hand shape and its motion through time. Although these are often considered as the governing part of the sign morphology, they alone do not enclose the full context of the conveyed information. To give clarity, add precisions and nuance their words, signers often use non-manual features, such as facial expressions, mouth gesture and body pose. This motivates our work to investigate whether explicitly modelling the body pose (hands, face, upper body) could benefit neural sign language translation.
 \subsubsection{Body Keypoints as Additional Inputs}
-In order to extract 2D and 3D body keypoints, we apply a pre-trained version of DOPE \cite{dope} to each frame in the PHOENIX-2014T dataset (Figure \ref{fig:2d_3d}). We slighltly modify the code provided by the authors by adding average and max-pooling layers on top of the ResNet50 backbone. We also experiment with argmax pooling, where we retain the $x$ and $y$ indices of the maximum of each feature map. In total, we have access to three pooled embeddings ($1024$-dim avg- and max-pooled embeddings, $2048$-dim argmax-pooled embeddings) as well as 2D and 3D whole-body keypoints (face: $84$ points, hands: $21$ points, body: $13$ points) for each frame in the PHOENIX-2014T dataset. We normalize the 2D keypoints by substracting the mean and dividing by the standard deviation of the corresponding body part. In order to assess whether or not these pose estimation features benefit sign language translation, we feed them as additional inputs to the Sign Language Transformer by simply concatenating them with the provided 2D CNN extracted embeddings, later refered as \textit{neccam} embeddings.
+In order to extract 2D and 3D body keypoints, we apply a pre-trained version of DOPE \cite{dope} to each frame in the PHOENIX-2014T dataset (Figure \ref{fig:2d_3d}). We slighltly modify the code provided by the authors by adding average and max-pooling layers on top of the ResNet50 backbone. We also experiment with argmax pooling, where we retain the $x$ and $y$ indices of the maximum of each feature map. In total, we have access to three pooled embeddings ($1024$-dim avg- and max-pooled embeddings, $2048$-dim argmax-pooled embeddings) as well as 2D and 3D whole-body keypoints (face: $84$ points, hands: $21$ points, body: $13$ points) for each frame in the PHOENIX-2014T dataset. We normalize the 2D keypoints by substracting the mean and dividing by the standard deviation of the corresponding body part. 3D keypoints are between $0$ and $1$ hence we don't try to normalize them further. In order to assess whether or not these pose estimation features benefit sign language translation, we feed them as additional inputs to the Sign Language Transformer by simply concatenating them with the provided 2D CNN extracted embeddings, later refered as \textit{baseline} embeddings.
 
 \begin{figure}[h]
 	\begin{subfigure}[h]{0.5\linewidth}
@@ -187,7 +187,7 @@ We summarize hereunder the translation performances observed on PHOENIX-2014T de
 	Input &  \multicolumn{4}{c}{DEV}\\
 	\midrule
 	{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
-	neccam   &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
+	baseline   &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
 	+avg   &  46.61 & 33.17   & 25.21  & 20.09\\
 	+max   &  45.98  &  32.44   & 24.79  & 19.99\\
 	+amax  &  \textbf{47.31} &  \textbf{33.34}   & 25.07  & 19.81\\
@@ -197,7 +197,7 @@ We summarize hereunder the translation performances observed on PHOENIX-2014T de
 \caption{Sign2Text with additional Pooling Embeddings}
 \label{tab:embeddings}
 \end{table}
-Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the performances of the five best experiments obtained when concatenating the same 2D CNN embeddings with the 2D (resp. 3D) body keypioints extracted using DOPE. While the 2D keypoints had to be normalized by the mean and standard deviation of the corresponding body part, the 3D keypoints were already between $0$ and $1$ hence didn't need to be normalized. 
+Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the performances of the five best experiments obtained when concatenating the same 2D CNN embeddings with the 2D (resp. 3D) body keypioints extracted using DOPE. 
 \begin{table}[h]
 	\centering
 	\def\arraystretch{0.9}
@@ -206,7 +206,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 		Input &  \multicolumn{4}{c}{DEV}\\
 		\midrule
 		{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
-		neccam   &  45.54 & \textbf{32.60}  & \textbf{25.30}  & \textbf{20.69}\\
+		baseline  &  45.54 & \textbf{32.60}  & \textbf{25.30}  & \textbf{20.69}\\
 		+hand\_2d   &  45.66 & 32.52   & 24.79  & 19.18\\
 		+face\_2d   &  46.06  &  32.44   & 24.63  & 19.61\\
 		+body\_2d   &  45.73 &  32.04   & 24.34  & 19.53\\	
@@ -226,7 +226,7 @@ Table \ref{tab:2d_keypoints} (resp. Table \ref{tab:3d_keypoints}) shows the perf
 		Input &  \multicolumn{4}{c}{DEV}\\
 		\midrule
 		{}   & BLEU-1   & BLEU-2    & BLEU-3   & BLEU-4\\
-		neccam   &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
+		baseline  &  45.54 & 32.60  & \textbf{25.30}  & \textbf{20.69}\\
 		+hand\_3d   &  46.19 & 32.49   & 24.24  & 18.92\\
 		+face\_3d   &  45.56  &  32.10 & 24.27  & 19.27\\
 		+body\_3d   &  44.96 &  31.96   & 24.32  & 19.46\\	
