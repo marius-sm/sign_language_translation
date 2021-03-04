@@ -3,8 +3,7 @@ import torch
 import time
 
 def evaluate_model(model, loader, training_step_fn):
-    model.eval()
-    
+   
     total_loss = 0.0
     total_correct = 0.0
     total_samples = 0
@@ -60,7 +59,9 @@ def train_model(model,
         for i, batch in enumerate(trainloader):
             
             if eval_every is not None and (i+1)%eval_every == 0:
+                model.eval()
                 valid_loss, valid_accuracy = evaluate_model(model, validloader, training_step_fn)
+                model.train()
                 print(f'Validation accuracy {valid_accuracy:.4f}, loss {valid_loss:.4f}\n')
                 val_losses.append(valid_loss)
                 val_accuracies.append(valid_accuracy)
@@ -108,7 +109,9 @@ def train_model(model,
         print(f'Epoch {epoch}: training loss {train_loss:.4f}, training accuracy {train_accuracy:.4f}')
         
         if validloader is not None and eval_every is None:
+            model.eval()
             valid_loss, valid_accuracy = evaluate_model(model, validloader, training_step_fn)
+            model.train()
             print(f'Validation accuracy {valid_accuracy:.4f}, loss {valid_loss:.4f}\n')
             val_losses.append(valid_loss)
             val_accuracies.append(valid_accuracy)
