@@ -62,7 +62,8 @@ class PhoenixDataset(torch.utils.data.Dataset):
         return_name=False,
         video_filter=lambda v: True,
         store_videos=False,
-        transform=None
+        transform=None,
+        resize_mode='bilinear'
         ):
         super(PhoenixDataset, self).__init__()
 
@@ -85,6 +86,7 @@ class PhoenixDataset(torch.utils.data.Dataset):
         self.store_videos = store_videos
         self.storage = {}
         self.transform = transform
+        self.resize_mode = resize_mode
 
         assert self.source_mode in ['gloss', 'text', 'video', 'sign', 'embedding'], 'Invalid source mode'
         assert self.target_mode in ['gloss', 'text', 'video', 'sign', 'embedding', None], 'Invalid target mode'
@@ -93,10 +95,17 @@ class PhoenixDataset(torch.utils.data.Dataset):
         # rescaling is slow
         return video.float()/(255*std) - (mean / std)
     
-    def resize_video(self, video, factor):
+    def resize_video(self, video, factor, mode=None):
         if factor == 1: return video
-        video = video.float()
-        video = F.interpolate(video, scale_factor=factor, mode='bilinear')
+        if mode is None:
+            mode = self.resize_mode
+        dtype = video.dtype
+        if mode != 'nearest':
+            video = video.float()
+        video = F.interpolate(video, scale_factor=factor, mode=mode)
+        if dtype == torch.uint8:
+            video = video.clamp(0, 255)
+        video = video.type(dtype)
         return video
 
     def get_video(self, idx):
